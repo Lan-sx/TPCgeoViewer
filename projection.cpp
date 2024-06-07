@@ -59,25 +59,11 @@ int main(int argc, char** argv)
     TApplication app("app",&argc,argv);
     //TRint app("app",&argc,argv);
     
-    //RunManager run1(0);
-    //std::printf("=======> Input Mode!\n");
-    //int mode;
-    //std::scanf("%d", &mode);
-    //cout << "========> " << mode << endl;
-    //run1.RunMode(mode);
-
-
-    geoEveViewer *g = new geoEveViewer("./TPC_ModularEndcap_o1_v01_MMCF.root", "./TPC_ModularEndcap_o1_v01_MMCF_Extract.root", 80.);
+    geoEveViewer *g = new geoEveViewer("../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root", 80.);
     g->MakeMultiViewer();
     
     TVector3 p0(0., 120., 280.), p1(0., 0., 1.);
     auto vecX0tables = g->Start_Track(p0, p1, kTRUE);
-
-    //std::printf("=========================================\n ");
-    //p1[1] = 1.; p1[2] = 0.;
-    //p0[1] = 0.; p0[2] = 145.;
-    //g->Start_Track(p0, p1, kTRUE);
-
 
     double totalDistance = 0.;
     double totalX0 = 0.;
@@ -89,6 +75,7 @@ int main(int argc, char** argv)
     
     std::for_each(vecX0tables.begin(), vecX0tables.end(), sumDistanceandX0);
 
+    // Create a gui table to show the material budget along the track
     GuiTable* te = new GuiTable();
 
     for (int i = 0; i < vecX0tables.size(); i++) {
@@ -104,23 +91,14 @@ int main(int argc, char** argv)
 
     te->Show();
 
-    //std::printf("=========================================\n ");
-    //p0[0] = 65.*TMath::Cos(0.015); p0[1] = 65.*TMath::Sin(-0.015); p0[2] = 145.;
-    //p1[0] = 0.; p1[2] = 0.; p1[2] = 1.;
-    //g->Start_Track(p0, p1, kTRUE);
-
-    //auto myc = new TCanvas("myc", "myc", 800, 600);
-    //auto geoMan = g->Get_Manager();
-    //TVector3 p_check(65., 0., 10.);
-    //geoMan->CheckPoint(p_check.x(), p_check.y(), p_check.z());
-
+    //load a helix track from Garfield++ 
     //g->LoadMCHelix("./IonInfoproton_0GeV_TDR_0.0500pad_2T_0.20.root");
     //g->DrawGeoinOGL();
     
 
     std::printf("============================== Code End!\n");
     app.Run(kTRUE);
-    return 0;
+    //return 0;
 }
 
 
