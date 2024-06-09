@@ -50,16 +50,16 @@ using namespace std;
 
 void test01()
 {
-    geoEveViewer::ExtractGentleVolume("./TPC_ModularEndcap_o1_v01_MMCF.root", "./TPC_ModularEndcap_o1_v01_MMCF_Extract.root",4);
+    geoEveViewer::ExtractGentleVolume("../../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root",4);
     //geoEveViewer::ExtractGentleVolume("./TPC_Simple_TDR_o1_v01_mm.root", "./TPC_Simple_TDR_o1_v01_mmExtract.root", 4);
 }
 
 int main(int argc, char** argv)
 {
-    TApplication app("app",&argc,argv);
-    //TRint app("app",&argc,argv);
-    
-    geoEveViewer *g = new geoEveViewer("../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root", 80.);
+    //TApplication app("app",&argc,argv);
+    TRint app("app",&argc,argv);
+    //test01();
+    geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root", 80.);
     g->MakeMultiViewer();
     
     TVector3 p0(0., 120., 280.), p1(0., 0., 1.);
