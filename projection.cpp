@@ -59,37 +59,17 @@ int main(int argc, char** argv)
     //TApplication app("app",&argc,argv);
     TRint app("app",&argc,argv);
     //test01();
-    geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root", 80.);
+    geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root", 80., kFALSE);
     g->MakeMultiViewer();
     
     TVector3 p0(0., 120., 280.), p1(0., 0., 1.);
-    auto vecX0tables = g->Start_Track(p0, p1, kTRUE);
-
-    double totalDistance = 0.;
-    double totalX0 = 0.;
-    auto sumDistanceandX0 = [&](X0tables& x0table) 
-    { 
-         totalDistance += x0table.arrContent[0];
-         totalX0 += x0table.arrContent[2];
-    };
+    auto vecX0tables = g->Start_Track(p0, p1, kFALSE);
     
-    std::for_each(vecX0tables.begin(), vecX0tables.end(), sumDistanceandX0);
+    GuiTable::ShowX0guiTable(vecX0tables);
 
-    // Create a gui table to show the material budget along the track
-    GuiTable* te = new GuiTable();
+    p1[1] = 1.; p1[2] = 0.;
+    GuiTable::ShowX0guiTable(g->Start_Track(p0, p1, kFALSE));
 
-    for (int i = 0; i < vecX0tables.size(); i++) {
-        te->AddRow(Form("%s", vecX0tables.at(i).matName.c_str()), 
-                   Form("%.4f",vecX0tables.at(i).arrContent[0]), 
-                   Form("%.4f",vecX0tables.at(i).arrContent[1]),
-                   Form("%.4f",vecX0tables.at(i).arrContent[2])
-                   );
-    }
-    TString cont1 = Form("total material budget = %.4f", totalX0);
-    auto cont = cont1 + "[%]";
-    te->AddRow("Summary", Form("totalDistance = %.4f [cm]", totalDistance), "", cont.Data());
-
-    te->Show();
 
     //load a helix track from Garfield++ 
     //g->LoadMCHelix("./IonInfoproton_0GeV_TDR_0.0500pad_2T_0.20.root");

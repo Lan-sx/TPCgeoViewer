@@ -26,8 +26,10 @@
 #include <fstream>
 
 
-geoEveViewer::geoEveViewer(TString rawGeofile, TString geoGentlefile, double voltransparency) :
-    geo_manager(nullptr), evem(nullptr), cmp(nullptr),fmultiview(nullptr), viewer("ogl"),fvolTransparency(voltransparency), ftrackColor(kMagenta), fgentleGeoName(geoGentlefile)
+geoEveViewer::geoEveViewer(TString rawGeofile, TString geoGentlefile, double voltransparency, Bool_t ismapWindow) :
+    geo_manager(nullptr), evem(nullptr), cmp(nullptr),fmultiview(nullptr), 
+    fmapWindow(ismapWindow), viewer("ogl"), fvolTransparency(voltransparency), ftrackColor(kMagenta),
+    fgentleGeoName(geoGentlefile)
 {
     //Rmove old cache file
     gSystem->Exec("del *.lnk");
@@ -40,7 +42,9 @@ geoEveViewer::geoEveViewer(TString rawGeofile, TString geoGentlefile, double vol
     }
 
     //Create Eve manager
-    evem = new TEveManager(1600,1000);
+    fevemWidth = 1200;
+    fevemHeight = 800;
+    evem = new TEveManager(fevemWidth,fevemHeight,fmapWindow);
 
     //Set cache file path
     TFile::SetCacheFileDir(".");
@@ -143,26 +147,6 @@ void geoEveViewer::Raytrace()
     GetTopVolume()->Raytrace();
 };
 
-//**********************************************************************
-
-//void geoEveViewer::Print_Stack(TString filter, TVector3 top, TVector3 dir)
-//{
-//    using namespace std;
-//    TRegexp reg(filter, 1);
-//    std::vector<TString> pname=Start_Track(top, dir, false);
-//    TVirtualGeoTrack *track=geo_manager->GetTrackOfId(0);
-//    for(Int_t i=0; i<track->GetNpoints(); i++){
-//        if( !(pname[i](reg) == 1) ){
-//            const Double_t* point=track->GetPoint(i);
-//            cout<<setw(10)<<i
-//                <<setw(38)<<pname[i]
-//                <<setw(10)<<point[0] 
-//                <<setw(10)<<point[1] 
-//                <<setw(10)<<point[2]
-//                <<endl;
-//        };
-//    }
-//};
 
 //**********************************************************************
 void geoEveViewer::LoadMCHelix(TString filename)

@@ -44,7 +44,7 @@ public:
      * @param rawGeofile -> exported from DD4hep
      * @param geoGentlefile -> gentle geo file extract from rawgeo file
      */
-    geoEveViewer(TString rawGeofile ,TString geoGentlefile, double voltransparency);
+    geoEveViewer(TString rawGeofile ,TString geoGentlefile, double voltransparency, Bool_t ismapWindow=kTRUE);
 
     /**
      * @brief 
@@ -114,17 +114,6 @@ public:
     /**
      * @brief 
      * Shoot a vector from a given point in a given direction through the geometry
-     * and print the encounter volumes
-     * @param TVector3 pstart 	Starting point
-     * @param TVector3 dirstart	Starting direction (direction cosines)
-     */
-    //void Print_Stack(TString filter="*",
-    //                 TVector3 top=TVector3(0.,0.,0.),
-    //                 TVector3 dir=TVector3(0.,0.,1.));
-
-    /**
-     * @brief 
-     * Shoot a vector from a given point in a given direction through the geometry
      * @param Char_t ptransparency Set the geometry tranparency 0/clear 100/opake
      */
     //void SetTransparency(Char_t ptransparency=50);
@@ -180,6 +169,9 @@ private:
     MultiView* fmultiview;
     TEveGeoShape* fgentlegeoshape;
 
+    UInt_t fevemWidth;
+    UInt_t fevemHeight;
+    Bool_t fmapWindow;
     TString viewer;
     Color_t ftrackColor;
     //Char_t transparency;
