@@ -14,6 +14,10 @@
 #include <TGSplitter.h>
 #include <TGTextEntry.h>
 
+#include <vector>
+#include <algorithm>
+#include "geoEveViewer.h"
+
 class GuiTable {
 
 private:
@@ -28,8 +32,17 @@ public:
 	GuiTable(const char* col1 = "Material", const char* col2 = "D [cm]", const char* col3 = "X0 [cm]", const char* col4 = "D/X0 [%]");
 	~GuiTable() { delete fMain; }
 
+
+
+	//Show a gui table to record the material budget along the virtual track, call "Start_Stack()" first
+	static void ShowX0guiTable(std::vector<X0tables>& v_X0tables);
+
+protected:
 	void AddRow(const char* e1 = "", const char* e2 = "", const char* e3 ="", const char* e4="");
 	void Show();
+
+
+
 };
 
 #endif

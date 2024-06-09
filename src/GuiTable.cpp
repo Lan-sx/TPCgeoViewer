@@ -9,6 +9,7 @@
 
 #include "GuiTable.h"
 
+ //**********************************************************************
 GuiTable::GuiTable(const char* col1, const char* col2, const char* col3, const char* col4)
 {
 	//
@@ -53,7 +54,7 @@ GuiTable::GuiTable(const char* col1, const char* col2, const char* col3, const c
 	fMain->Resize();
 }
 
-//______________________________________________________________________________
+//**********************************************************************
 void GuiTable::AddRow(const char* e1, const char* e2, const char* e3, const char* e4)
 {
 	//
@@ -72,10 +73,41 @@ void GuiTable::AddRow(const char* e1, const char* e2, const char* e3, const char
 	fMain->Resize();
 }
 
-//______________________________________________________________________________
+//**********************************************************************
 void GuiTable::Show()
 {
 	//
 	fMain->MapSubwindows();
 	fMain->MapRaised();
+}
+
+//**********************************************************************
+void GuiTable::ShowX0guiTable(std::vector<X0tables>& v_X0tables)
+{
+	double totalDistance = 0.;
+	double totalX0 = 0.;
+	auto sumDistanceandX0 = [&](X0tables& x0table)
+	{
+		totalDistance += x0table.arrContent[0];
+		totalX0 += x0table.arrContent[2];
+	};
+
+	std::for_each(v_X0tables.begin(), v_X0tables.end(), sumDistanceandX0);
+
+
+	// Create a gui table to show the material budget along the track
+	GuiTable* te = new GuiTable();
+
+	for (int i = 0; i < v_X0tables.size(); i++) {
+		te->AddRow(Form("%s", v_X0tables.at(i).matName.c_str()),
+			Form("%.4f", v_X0tables.at(i).arrContent[0]),
+			Form("%.4f", v_X0tables.at(i).arrContent[1]),
+			Form("%.4f", v_X0tables.at(i).arrContent[2])
+		);
+	}
+	TString conttemp = Form("total material budget = %.4f", totalX0);
+	auto cont = conttemp + "[%]";
+	te->AddRow("Summary", Form("totalDistance = %.4f [cm]", totalDistance), "", cont.Data());
+
+	te->Show();
 }
