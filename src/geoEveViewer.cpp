@@ -32,7 +32,7 @@ geoEveViewer::geoEveViewer(TString rawGeofile, TString geoGentlefile, double vol
     fgentleGeoName(geoGentlefile)
 {
     //Rmove old cache file
-    gSystem->Exec("del *.lnk");
+    //gSystem->Exec("del *.lnk");
     //Initial Geomanager
     geo_manager = TGeoManager::Import(rawGeofile.Data());
     if (!geo_manager)

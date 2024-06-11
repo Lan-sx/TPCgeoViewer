@@ -7,6 +7,7 @@
  * Update           : 
  * ******************************************************************/
 
+#include <map>
 #include "GuiTable.h"
 
  //**********************************************************************
@@ -84,30 +85,96 @@ void GuiTable::Show()
 //**********************************************************************
 void GuiTable::ShowX0guiTable(std::vector<X0tables>& v_X0tables)
 {
-	double totalDistance = 0.;
-	double totalX0 = 0.;
-	auto sumDistanceandX0 = [&](X0tables& x0table)
-	{
-		totalDistance += x0table.arrContent[0];
-		totalX0 += x0table.arrContent[2];
-	};
+	std::vector<X0tables> vResult;
 
-	std::for_each(v_X0tables.begin(), v_X0tables.end(), sumDistanceandX0);
+	//merge T2K gas layers to avoiding too many rows of the gui table
+	auto findT2Kmat = [](X0tables& X0table) { return X0table.matName == "T2KGas1"; };
+	double sumDistance = 0.;
+	double sumX0 = 0.;
+	auto sumDistanceandX0 = [&](X0tables& x0table)
+		{
+			sumDistance += x0table.arrContent[0];
+			sumX0 += x0table.arrContent[2];
+		};
+
+
+	auto numlayerT2K = std::count_if(v_X0tables.begin(), v_X0tables.end(), findT2Kmat);
+	if (numlayerT2K >= 4)
+	{
+		//auto itfirst = std::find_if(v_X0tables.begin(), v_X0tables.end(), findT2Kmat);
+		//auto itend = std::find_if_not(itfirst + 1, v_X0tables.end(), findT2Kmat);
+
+		//std::for_each(itfirst, itend,sumDistanceandX0);
+
+		//X0tables tempX0table;
+		//tempX0table.matName = "T2KGas1";
+		//tempX0table.arrContent[0] = sumDistance;
+		//tempX0table.arrContent[1] = (*itfirst).arrContent[1];
+		//tempX0table.arrContent[2] = sumDistance * 100 / (*itfirst).arrContent[1];
+
+		//v_X0tables.erase(itfirst, itend);
+		//v_X0tables.insert(itfirst, tempX0table);
+
+		double sumD = 0.,T2KgasRadLen=0.;
+		int Cnt = 0;
+		auto it_start = v_X0tables.begin();
+		X0tables tempX0table;
+		tempX0table.matName = "T2KGas1";
+		while (it_start != v_X0tables.end())
+		{
+			if ((*it_start).matName == "T2KGas1")
+			{
+				sumD += (*it_start).arrContent[0];
+				Cnt++;
+				T2KgasRadLen = (*it_start).arrContent[1];
+				it_start = v_X0tables.erase(it_start);
+			}
+			else
+			{
+				if (Cnt > 0)
+				{
+					tempX0table.arrContent[0] = sumD;
+					tempX0table.arrContent[1] = T2KgasRadLen;
+					tempX0table.arrContent[2] = sumD * 100 / T2KgasRadLen;
+					v_X0tables.insert(it_start, tempX0table);
+					sumD = 0.;
+					Cnt = 0;
+				}
+				++it_start;
+			}
+		}
+
+		if (Cnt > 0)
+		{
+			tempX0table.arrContent[0] = sumD;
+			tempX0table.arrContent[1] = T2KgasRadLen;
+			tempX0table.arrContent[2] = sumD * 100 / T2KgasRadLen;
+			v_X0tables.push_back(tempX0table);
+		}
+
+		vResult = std::move(v_X0tables);
+	}
+	else
+		vResult = std::move(v_X0tables);
+
+	sumDistance = 0.;
+	sumX0 = 0.;
+	std::for_each(vResult.begin(), vResult.end(), sumDistanceandX0);
 
 
 	// Create a gui table to show the material budget along the track
 	GuiTable* te = new GuiTable();
 
-	for (int i = 0; i < v_X0tables.size(); i++) {
-		te->AddRow(Form("%s", v_X0tables.at(i).matName.c_str()),
-			Form("%.4f", v_X0tables.at(i).arrContent[0]),
-			Form("%.4f", v_X0tables.at(i).arrContent[1]),
-			Form("%.4f", v_X0tables.at(i).arrContent[2])
+	for (int i = 0; i < vResult.size(); i++) {
+		te->AddRow(Form("%s", vResult.at(i).matName.c_str()),
+			Form("%.4f", vResult.at(i).arrContent[0]),
+			Form("%.4f", vResult.at(i).arrContent[1]),
+			Form("%.4f", vResult.at(i).arrContent[2])
 		);
 	}
-	TString conttemp = Form("total material budget = %.4f", totalX0);
+	TString conttemp = Form("total material budget = %.4f", sumX0);
 	auto cont = conttemp + "[%]";
-	te->AddRow("Summary", Form("totalDistance = %.4f [cm]", totalDistance), "", cont.Data());
+	te->AddRow("Summary", Form("totalDistance = %.4f [cm]", sumDistance), "", cont.Data());
 
 	te->Show();
 }
