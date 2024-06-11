@@ -181,7 +181,7 @@ void geoEveViewer::LoadMCHelix(TString filename)
     line->SetLineWidth(1);
     line->SetRnrPoints(true);
 
-    for (int i = 0; i < vi_Entry/2.; i++)
+    for (int i = 0; i < vi_Entry; i++)
     {
         myTreeIn->GetEntry(i);
         for (int ii = 0; ii < vi_vecXe->size(); ++ii)
