@@ -225,6 +225,7 @@ std::vector<X0tables> geoEveViewer::Start_Track(TVector3 pstart, TVector3 dirsta
     double sumofMaterial = 0.;
     double preMaterialRadLen = nextnode->GetMedium()->GetMaterial()->GetRadLen();
     auto preMaterialName = nextnode->GetMedium()->GetMaterial()->GetName();
+    TVector3 prePoint = pstart;
 
     X0tables x0table;
     std::vector<X0tables> vecX0table;
@@ -237,21 +238,26 @@ std::vector<X0tables> geoEveViewer::Start_Track(TVector3 pstart, TVector3 dirsta
         time++;
         auto cur_material = nextnode->GetMedium()->GetMaterial();
         auto cur_matRadlen = cur_material->GetRadLen();
-        Double_t step = geo_manager->GetStep();
+        //Double_t step = geo_manager->GetStep();
         Double_t safety = geo_manager->GetSafeDistance();
 
-        auto fracMatRadLen = step / preMaterialRadLen;
+        //check geo_manager->GetStep() and distance between pre_point and pos_point
+        double d_step = (point - prePoint).Mag();
+        //if (TMath::Abs(d_step - step) > 1.e-4)
+        //    std::printf("===========Flags1\n");
+
+        auto fracMatRadLen = d_step / preMaterialRadLen;
         sumofMaterial += fracMatRadLen;
 
         x0table.matName = preMaterialName;
-        x0table.arrContent[0] = step;
+        x0table.arrContent[0] = d_step;
         x0table.arrContent[1] = preMaterialRadLen;
         x0table.arrContent[2] = fracMatRadLen * 100.;
 
         vecX0table.push_back(x0table);
 
         if(verbose){
-            cout<<"StepLength" 	<<setw(8) << step << "\t"
+            cout<<"StepLength" 	<<setw(12) << d_step << "\t"
                 <<"Mat "        <<setw(12) << preMaterialName 
                 <<" -> "        <<setw(16) << fracMatRadLen << " X0 "
                 <<"Safety" 	    <<setw(8)<< safety << "\t";
@@ -260,6 +266,7 @@ std::vector<X0tables> geoEveViewer::Start_Track(TVector3 pstart, TVector3 dirsta
         }
         preMaterialName = cur_material->GetName();
         preMaterialRadLen = cur_matRadlen;
+        prePoint = point;
     }
 
     if(verbose)
