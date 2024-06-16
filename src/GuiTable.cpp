@@ -101,20 +101,6 @@ void GuiTable::ShowX0guiTable(std::vector<X0tables>& v_X0tables)
 	auto numlayerT2K = std::count_if(v_X0tables.begin(), v_X0tables.end(), findT2Kmat);
 	if (numlayerT2K >= 4)
 	{
-		//auto itfirst = std::find_if(v_X0tables.begin(), v_X0tables.end(), findT2Kmat);
-		//auto itend = std::find_if_not(itfirst + 1, v_X0tables.end(), findT2Kmat);
-
-		//std::for_each(itfirst, itend,sumDistanceandX0);
-
-		//X0tables tempX0table;
-		//tempX0table.matName = "T2KGas1";
-		//tempX0table.arrContent[0] = sumDistance;
-		//tempX0table.arrContent[1] = (*itfirst).arrContent[1];
-		//tempX0table.arrContent[2] = sumDistance * 100 / (*itfirst).arrContent[1];
-
-		//v_X0tables.erase(itfirst, itend);
-		//v_X0tables.insert(itfirst, tempX0table);
-
 		double sumD = 0.,T2KgasRadLen=0.;
 		int Cnt = 0;
 		auto it_start = v_X0tables.begin();
