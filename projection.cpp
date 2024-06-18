@@ -45,30 +45,33 @@
 #include <iostream>
 #include <algorithm>
 #include <numeric>
+#include <exception>
 using namespace std;
 
 
-void test01()
+void extractGentle()
 {
-    geoEveViewer::ExtractGentleVolume("../../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root",4);
+    //geoEveViewer::ExtractGentleVolume("../../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root",4);
     //geoEveViewer::ExtractGentleVolume("./TPC_Simple_TDR_o1_v01_mm.root", "./TPC_Simple_TDR_o1_v01_mmExtract.root", 4);
 }
 
 int main(int argc, char** argv)
 {
-    //TApplication app("app",&argc,argv);
-    TRint app("app",&argc,argv);
+    TApplication app("app",&argc,argv);
+    //TRint app("app",&argc,argv);
     //test01();
-    geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root", 80., kFALSE);
+    geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root", 80., kTRUE);
     g->MakeMultiViewer();
+    g->MakeLeftGUI();
     
-    TVector3 p0(0., 120., 280.), p1(0., 0., 1.);
-    auto vecX0tables = g->Start_Track(p0, p1, kFALSE);
+    TVector3 p0(0., 160., -140.), p1(0., 1., 0.);
+    //auto vecX0tables1 = g->Start_Track(p0, p1, kFALSE);
     
-    GuiTable::ShowX0guiTable(vecX0tables);
+    //GuiTable::ShowX0guiTable(vecX0tables1);
 
-    p1[1] = 1.; p1[2] = 0.;
-    GuiTable::ShowX0guiTable(g->Start_Track(p0, p1, kFALSE));
+    //p1[1] = 1.; p1[2] = 2.;
+    auto vecX0table2 =g->Start_Track(p0, p1, kTRUE);
+    GuiTable::ShowX0guiTable(vecX0table2);
 
 
     //load a helix track from Garfield++ 
