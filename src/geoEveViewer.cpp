@@ -16,6 +16,8 @@
 #include <TGLViewer.h>
 #include <TRegexp.h>
 #include <TEveLine.h>
+#include <TGTab.h>
+#include <TGButton.h>
 
 
 #include <TFile.h>
@@ -328,6 +330,34 @@ void geoEveViewer::MakeMultiViewer()
     evem->GetDefaultGLViewer()->SetStyle(TGLRnrCtx::kOutline);
 
     evem->Redraw3D(kTRUE);
+}
+
+//**********************************************************************
+void geoEveViewer::MakeLeftGUI()
+{
+    evem->GetBrowser()->GetTabRight()->SetTab(1);
+
+    auto browser = evem->GetBrowser();
+    browser->StartEmbedding(TRootBrowser::kLeft);
+
+    auto frmMain = new TGMainFrame(gClient->GetRoot(), 1000, 600);
+    frmMain->SetWindowName("GeoViewer GUI");
+    frmMain->SetCleanup(kDeepCleanup);
+
+    auto hframe = new TGHorizontalFrame(frmMain);
+
+    TGTextButton* EXIT = new TGTextButton(hframe, "&Exit", "gSystem->Exit(-1)");
+    hframe->AddFrame(EXIT, new TGLayoutHints(kLHintsCenterX, 5, 5, 3, 4));
+
+    frmMain->AddFrame(hframe);
+
+    frmMain->MapSubwindows();
+    frmMain->Resize();
+    frmMain->MapWindow();
+
+    browser->StopEmbedding();
+    browser->SetTabTitle("Viewer Control", 0);
+
 }
 
 //**********************************************************************
