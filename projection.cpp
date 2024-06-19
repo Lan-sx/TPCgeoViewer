@@ -12,30 +12,9 @@
 #include <TRint.h>
 #include "TFile.h"
 #include <TVector3.h>
-#include <TRegexp.h>
 #include <TList.h>
 #include <TSystem.h>
-//#include <TCanvas.h>
 
-//#include <TGeoManager.h>
-//#include <TGeoVolume.h>
-//#include <TGeoNode.h>
-//#include <TVirtualGeoTrack.h>
-//#include <TGeoMaterial.h>
-
-//#include <TEveManager.h>
-//#include <TEveGeoNode.h>
-//#include <TEveCompound.h>
-//#include <TEveLine.h>
-#include "TEveViewer.h"
-//#include "TEveProjections.h"
-//#include "TEveProjectionManager.h"
-//#include "TEveScene.h"
-//#include "TEveProjectionAxes.h"
-#include <TGLViewer.h>
-#include <TGTab.h>
-
-#include <TEveGeoShape.h>
 
 #include "geoEveViewer.h"
 #include "MultiView.h"
