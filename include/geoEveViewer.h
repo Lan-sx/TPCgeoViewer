@@ -57,7 +57,14 @@ public:
      * Get get the TGeoManager
      * @return TGeoManager*  
      */
-    TGeoManager* Get_Manager(){return geo_manager; };
+    TGeoManager* Get_GeoManager(){return geo_manager; };
+
+    /**
+     * @brief
+     * Get get the TGeoManager
+     * @return TGeoManager*
+     */
+    TEveManager* Get_EveManager() { return evem; }
 
     /**
      * @brief 
@@ -123,12 +130,6 @@ public:
      * Make MultiView: 3D view / RhoPhi view  / RhoZ view 
      */
     void MakeMultiViewer();
-
-    /**
-     * @brief 
-     * Make a GUI at Left Side
-     */
-    void MakeLeftGUI();
 
     /**
      * @brief

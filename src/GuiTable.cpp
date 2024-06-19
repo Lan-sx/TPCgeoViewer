@@ -10,7 +10,35 @@
 #include <map>
 #include "GuiTable.h"
 
- //**********************************************************************
+//**********************************************************************
+GuiTable::GuiTable(TEveManager* evem) : fLo(nullptr),fV1(nullptr),fV2(nullptr),fV3(nullptr),fV4(nullptr)
+{
+	evem->GetBrowser()->GetTabRight()->SetTab(1);
+
+	auto browser = evem->GetBrowser();
+	browser->StartEmbedding(TRootBrowser::kLeft);
+
+	fMain = new TGMainFrame(gClient->GetRoot(), 1000, 600);
+	fMain->SetWindowName("GeoViewer GUI");
+	fMain->SetCleanup(kDeepCleanup);
+
+	auto hframe = new TGHorizontalFrame(fMain);
+
+	TGTextButton* EXIT = new TGTextButton(hframe, "&Exit", "gSystem->Exit(-1)");
+	hframe->AddFrame(EXIT, new TGLayoutHints(kLHintsCenterX, 5, 5, 3, 4));
+
+	fMain->AddFrame(hframe);
+
+	fMain->MapSubwindows();
+	fMain->Resize();
+	fMain->MapWindow();
+
+	browser->StopEmbedding();
+	browser->SetTabTitle("Viewer Control", 0);
+}
+
+
+//**********************************************************************
 GuiTable::GuiTable(const char* col1, const char* col2, const char* col3, const char* col4)
 {
 	//

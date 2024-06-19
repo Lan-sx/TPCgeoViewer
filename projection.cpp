@@ -15,24 +15,25 @@
 #include <TRegexp.h>
 #include <TList.h>
 #include <TSystem.h>
-#include <TCanvas.h>
+//#include <TCanvas.h>
 
-#include <TGeoManager.h>
-#include <TGeoVolume.h>
-#include <TGeoNode.h>
-#include <TVirtualGeoTrack.h>
-#include <TGeoMaterial.h>
+//#include <TGeoManager.h>
+//#include <TGeoVolume.h>
+//#include <TGeoNode.h>
+//#include <TVirtualGeoTrack.h>
+//#include <TGeoMaterial.h>
 
-#include <TEveManager.h>
-#include <TEveGeoNode.h>
-#include <TEveCompound.h>
-#include <TEveLine.h>
+//#include <TEveManager.h>
+//#include <TEveGeoNode.h>
+//#include <TEveCompound.h>
+//#include <TEveLine.h>
 #include "TEveViewer.h"
-#include "TEveProjections.h"
-#include "TEveProjectionManager.h"
-#include "TEveScene.h"
-#include "TEveProjectionAxes.h"
+//#include "TEveProjections.h"
+//#include "TEveProjectionManager.h"
+//#include "TEveScene.h"
+//#include "TEveProjectionAxes.h"
 #include <TGLViewer.h>
+#include <TGTab.h>
 
 #include <TEveGeoShape.h>
 
@@ -55,6 +56,7 @@ void extractGentle()
     //geoEveViewer::ExtractGentleVolume("./TPC_Simple_TDR_o1_v01_mm.root", "./TPC_Simple_TDR_o1_v01_mmExtract.root", 4);
 }
 
+
 int main(int argc, char** argv)
 {
     TApplication app("app",&argc,argv);
@@ -62,16 +64,19 @@ int main(int argc, char** argv)
     //test01();
     geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MMCF.root", "../../geodata/TPC_ModularEndcap_o1_v01_MMCF_Extract.root", 80., kTRUE);
     g->MakeMultiViewer();
-    g->MakeLeftGUI();
     
-    TVector3 p0(0., 160., -140.), p1(0., 1., 0.);
+    GuiTable* gui = new GuiTable(g->Get_EveManager());
+    
+    //g->MakeLeftGUI();
+    
+    //TVector3 p0(0., 160., -140.), p1(0., 1., 0.);
     //auto vecX0tables1 = g->Start_Track(p0, p1, kFALSE);
     
     //GuiTable::ShowX0guiTable(vecX0tables1);
 
     //p1[1] = 1.; p1[2] = 2.;
-    auto vecX0table2 =g->Start_Track(p0, p1, kTRUE);
-    GuiTable::ShowX0guiTable(vecX0table2);
+    //auto vecX0table2 =g->Start_Track(p0, p1, kTRUE);
+    //GuiTable::ShowX0guiTable(vecX0table2);
 
 
     //load a helix track from Garfield++ 

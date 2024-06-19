@@ -333,34 +333,6 @@ void geoEveViewer::MakeMultiViewer()
 }
 
 //**********************************************************************
-void geoEveViewer::MakeLeftGUI()
-{
-    evem->GetBrowser()->GetTabRight()->SetTab(1);
-
-    auto browser = evem->GetBrowser();
-    browser->StartEmbedding(TRootBrowser::kLeft);
-
-    auto frmMain = new TGMainFrame(gClient->GetRoot(), 1000, 600);
-    frmMain->SetWindowName("GeoViewer GUI");
-    frmMain->SetCleanup(kDeepCleanup);
-
-    auto hframe = new TGHorizontalFrame(frmMain);
-
-    TGTextButton* EXIT = new TGTextButton(hframe, "&Exit", "gSystem->Exit(-1)");
-    hframe->AddFrame(EXIT, new TGLayoutHints(kLHintsCenterX, 5, 5, 3, 4));
-
-    frmMain->AddFrame(hframe);
-
-    frmMain->MapSubwindows();
-    frmMain->Resize();
-    frmMain->MapWindow();
-
-    browser->StopEmbedding();
-    browser->SetTabTitle("Viewer Control", 0);
-
-}
-
-//**********************************************************************
 void geoEveViewer::SetVolumeTransparency(TGeoManager* geoman,double voltransparency)
 {
 	geoman->SetNsegments(40);
