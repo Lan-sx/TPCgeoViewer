@@ -204,7 +204,7 @@ void geoEveViewer::LoadMCHelix(TString filename)
 
 //**********************************************************************
 
-std::vector<X0tables> geoEveViewer::Start_Track(TVector3 pstart, TVector3 dirstart, Bool_t verbose)
+std::vector<X0tables> geoEveViewer::Start_Track(TVector3 pstart, TVector3 dirstart, Bool_t verbose, double& XoverX0)
 {
     using namespace std;
     cout.precision(8);
@@ -274,10 +274,28 @@ std::vector<X0tables> geoEveViewer::Start_Track(TVector3 pstart, TVector3 dirsta
     if(verbose)
         cout << "$$$$$$$$$$$ Material along the track correspods to : " << sumofMaterial << endl;
     
-    
+    XoverX0 = sumofMaterial;
     DrawTrack(track);
     return vecX0table;
 };
+
+//**********************************************************************
+TH1D* geoEveViewer::GetXoverX0vsTheta()
+{
+    auto hXoverX0vsTheta = new TH1D("hXoverX0vsTheta", ";#theta [Degree];X/X_{0}",45,-90.,0.);
+    for (int itrk = 0; itrk < 45; ++itrk)
+    {
+        double theta = 0.-itrk*2;
+        double radtheta = TMath::DegToRad() * theta;
+        TVector3 pstart(0., 0., 0.);
+        TVector3 directVec(-TMath::Sin(radtheta)*TMath::Cos(TMath::PiOver4()), TMath::Sin(radtheta)*TMath::Cos(TMath::PiOver4()), TMath::Cos(radtheta));
+
+        double XoverX0(0.);
+        this->Start_Track(pstart, directVec,  kFALSE, XoverX0);
+        hXoverX0vsTheta->SetBinContent(45-itrk, XoverX0);
+    }
+    return hXoverX0vsTheta;
+}
 
 //**********************************************************************
 

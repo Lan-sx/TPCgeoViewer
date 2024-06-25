@@ -13,6 +13,8 @@
 #include <array>
 #include <Riostream.h>
 
+#include <TH1D.h>
+#include <TRandom3.h>
 #include <TString.h>
 #include <TSystem.h>
 #include <TEveGeoShape.h>
@@ -97,12 +99,20 @@ public:
      * and optional print the encounter volumes
      * @param TVector3 pstart 	Starting point
      * @param TVector3 dirstart	Starting direction (direction cosines)
+     * @param Double_t XoverX0  return X/X0 over this straight track
      * @param Bool_t verbose		kTRUE/print out encountered volumes
      * @return std::vector<TString> 	A vector of encountered volume names
      */
-    std::vector<X0tables>  Start_Track(TVector3 pstart=	TVector3(0.,0.,0.),
-                                      TVector3 dirstart=	TVector3(0.,0.,1.),
-                                      Bool_t verbose=	kTRUE);
+    std::vector<X0tables>  Start_Track(TVector3 pstart   ,
+                                       TVector3 dirstart , 
+                                       Bool_t   verbose ,
+                                       double   &XoverX0 );
+
+    /**
+     * @brief
+     * 
+     */
+    TH1D* GetXoverX0vsTheta();
 
     /**
      * @brief 
