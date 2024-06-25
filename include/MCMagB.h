@@ -26,10 +26,7 @@ public:
 
     TEveVectorD GetFieldD(Double_t /*x*/, Double_t /*y*/, Double_t z) const override
     {
-        if (z > 0.) 
-            return TEveVectorD(0, 0, -fmagB);
-        else 
-            return TEveVectorD(0, 0, fmagB);
+        return TEveVectorD(0, 0, fmagB);
         //if (TMath::Abs(z) < 600) return TEveVectorD(0, 0, 0);
     }
 };
