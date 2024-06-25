@@ -3,14 +3,16 @@
  * Email            : shexin@ihep.ac.cn
  * Last modified    : 2024-06-06 21:39
  * Filename         : GuiTable.h
- * Description      : A Gui Table to show the material budget 
- *                    along the straight track
- * Update           : 
+ * Description      : A Gui Table Embed in Eve browser             
+ * Update           : 2024.06.06 Origin : A Gui Table to show 
+ *                               the X0 along the straight track
+ *					  2024.06.19 As a Gui manager
  * ******************************************************************/
 #ifndef __GuiTable_H__
 #define __GuiTable_H__ 1
 
 #include <TGButton.h>
+#include <TGTab.h>
 #include <TGSplitter.h>
 #include <TGTextEntry.h>
 
@@ -22,6 +24,7 @@ class GuiTable {
 
 private:
 	TGMainFrame* fMain;
+
 	TGLayoutHints* fLo;
 	TGVerticalFrame* fV1;
 	TGVerticalFrame* fV2;
@@ -29,10 +32,9 @@ private:
 	TGVerticalFrame* fV4;
 
 public:
+	GuiTable(TEveManager * evem);
 	GuiTable(const char* col1 = "Material", const char* col2 = "D [cm]", const char* col3 = "X0 [cm]", const char* col4 = "D/X0 [%]");
 	~GuiTable() { delete fMain; }
-
-
 
 	//Show a gui table to record the material budget along the virtual track, call "Start_Stack()" first
 	static void ShowX0guiTable(std::vector<X0tables>& v_X0tables);
