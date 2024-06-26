@@ -1,7 +1,7 @@
 # TPCgeoViewer
 
 ## Description
-A tool for CEPC_TPC geo visualization based on [`ROOT Event Dispaly`](https://root.cern/doc/master/group_tutorial_eve.html)
+A tool for CEPC_TPC geo visualization based on [`ROOT Event Dispaly`](https://root.cern/doc/master/group__tutorial__eve.html)
 
 ## Request
 + ROOT
