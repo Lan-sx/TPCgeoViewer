@@ -110,9 +110,15 @@ public:
 
     /**
      * @brief
-     * 
+     * Get X/X0 v.s. theta Hist
      */
     TH1D* GetXoverX0vsTheta();
+
+    /** 
+     * @brief
+     * Turn off DrawTrack() when Shoot large number of tracks
+     */
+    void TurnOffDrawTrack() { fdrawTrack = kFALSE; }
 
     /**
      * @brief 
@@ -189,6 +195,7 @@ private:
     UInt_t fevemWidth;
     UInt_t fevemHeight;
     Bool_t fmapWindow;
+    Bool_t fdrawTrack;
     TString viewer;
     Color_t ftrackColor;
     //Char_t transparency;
