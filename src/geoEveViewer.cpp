@@ -78,6 +78,10 @@ geoEveViewer::geoEveViewer(TString rawGeofile, TString geoGentlefile, double vol
 
     //Alway draw the track when call `Start_Track` 
     fdrawTrack = kTRUE;
+
+    fTrkColor[22] = kGreen;
+    fTrkColor[-11] = kBlue;
+    fTrkColor[11] = kRed;
 }
 
 geoEveViewer::~geoEveViewer()
@@ -158,7 +162,7 @@ void geoEveViewer::LoadMCHelix(TString filename)
     auto file = TFile::Open(filename.Data());
     if (!file) return;
 
-    TTree* myTreeIn = (TTree*)file->Get("IonEleInfo");
+    TTree* myTreeIn = (TTree*)file->Get("trTPCtracks");
     int vi_Entry = myTreeIn->GetEntries();
 
     std::cout << "======================= " << vi_Entry << std::endl;
@@ -170,33 +174,46 @@ void geoEveViewer::LoadMCHelix(TString filename)
     auto vi_vecYe = new std::vector<double>();
     auto vi_vecZe = new std::vector<double>();
 
-    myTreeIn->SetBranchAddress("vecxe", &vi_vecXe);
-    myTreeIn->SetBranchAddress("vecye", &vi_vecYe);
-    myTreeIn->SetBranchAddress("vecze", &vi_vecZe);
-
-
+    myTreeIn->SetBranchAddress("px", &vi_vecXe);
+    myTreeIn->SetBranchAddress("py", &vi_vecYe);
+    myTreeIn->SetBranchAddress("pz", &vi_vecZe);
 
     cmp->OpenCompound();
-    TEveLine* line = new TEveLine;
-    line->SetMainColor(ftrackColor);
-    line->SetLineColor(ftrackColor);
-    line->SetMarkerColor(ftrackColor);
-    line->SetLineStyle(1);
-    line->SetLineWidth(1);
-    line->SetRnrPoints(true);
 
-    for (int i = 0; i < vi_Entry; i++)
+
+    for (int i = 0; i < 200; i++)
     {
         myTreeIn->GetEntry(i);
-        for (int ii = 0; ii < vi_vecXe->size(); ++ii)
+        TEveLine* line = new TEveLine;
+        line->SetMainColor(ftrackColor);
+        line->SetLineColor(ftrackColor);
+        line->SetMarkerColor(ftrackColor);
+        line->SetLineStyle(1);
+        line->SetLineWidth(1);
+        line->SetRnrPoints(true);
+
+        auto vSize = vi_vecXe->size();
+        double rrstart1 = TMath::Sqrt(std::pow(vi_vecXe->at(0) / 10, 2) +
+            std::pow(vi_vecYe->at(0) / 10, 2));
+      
+        double rrstart2 = TMath::Sqrt(std::pow(vi_vecXe->at(vSize-1) / 10, 2) +
+            std::pow(vi_vecYe->at(vSize-1) / 10, 2));
+
+        double rrmin = std::min(rrstart1, rrstart2);
+        if (rrmin < 68.)
         {
-            line->SetNextPoint(vi_vecXe->at(ii), vi_vecYe->at(ii), vi_vecZe->at(ii));
+            for (int ii = 0; ii < vi_vecXe->size(); ++ii)
+            {
+                line->SetNextPoint(vi_vecXe->at(ii) / 10., vi_vecYe->at(ii) / 10., vi_vecZe->at(ii) / 10.);
+            }
         }
+
+        cmp->AddElement(line);
+        cmp->CloseCompound();
+        this->UpdateProjectedView();
     }
 
-    cmp->AddElement(line);
-    cmp->CloseCompound();
-    this->UpdateProjectedView();
+
     file->Close();
     delete file;
     //evem->Redraw3D(kFALSE);
@@ -438,7 +455,7 @@ TEveTrack* geoEveViewer::Make_Helixtrack(TEveTrackPropagator* prop, TVector3 pst
     return track;
 }
 
-
+//**********************************************************************
 void geoEveViewer::GenMCHelixTrack(TVector3 pstart, TVector3 pend, double magB , bool isRungKutta)
 {
     auto list = new TEveTrackList();
@@ -473,4 +490,42 @@ void geoEveViewer::GenMCHelixTrack(TVector3 pstart, TVector3 pend, double magB ,
     this->UpdateProjectedView();
 
 
+}
+
+//**********************************************************************
+void geoEveViewer::PlotTracks(const std::map<int, std::vector<tracks_eeg>>& inputTrkMap, int maxtracks, bool onlyee)
+{
+
+    int cnt_gammatrk = 0;
+    cmp->OpenCompound();
+    for (const auto item : inputTrkMap)
+    {
+        if (cnt_gammatrk >= maxtracks)
+            break;
+        cnt_gammatrk++;
+        std::cout << "============> " << item.second.size() << std::endl;
+        for (auto trks : item.second)
+        {
+            if (trks.pdg == 22 && onlyee)
+                continue;
+            TEveLine* trkline = new TEveLine(trks.vxp.size());
+            trkline->SetMainColor(fTrkColor[trks.pdg]);
+            trkline->SetLineColor(fTrkColor[trks.pdg]);
+            trkline->SetMarkerColor(fTrkColor[trks.pdg]);
+            trkline->SetLineStyle(1);
+            trkline->SetLineWidth(1);
+            trkline->SetRnrPoints(true);
+            std::printf("[INFO]: %d-th gamma with %zu secondary e-/e+, pdg=%d step size=%zu \n", item.first, item.second.size(),trks.pdg,trks.vxp.size());
+            for (size_t ipoint = 0; ipoint < trks.vxp.size(); ++ipoint)
+            {
+                trkline->SetPoint(ipoint, trks.vxp.at(ipoint)/10.,
+                    trks.vyp.at(ipoint)/10.,
+                    trks.vzp.at(ipoint)/10.);
+            }
+
+            cmp->AddElement(trkline);
+            cmp->CloseCompound();
+            this->UpdateProjectedView();
+        }
+    }
 }

@@ -26,6 +26,7 @@
 #include <TEveTrack.h>
 
 #include "MultiView.h"
+#include "Bkgtrack.h"
 
 struct X0tables
 {
@@ -178,6 +179,13 @@ public:
     */
     void GenMCHelixTrack(TVector3 pstart, TVector3 pend, double magB=-2.,bool isRungKutta=true);
 
+    /**
+    * @brief
+    * Plot bkg gamma and secondary e+/e-
+    *
+    */
+    void PlotTracks(const std::map<int,std::vector<tracks_eeg>>& inputTrkMap, int maxtracks, bool onlyee=false);
+
 protected:
     TEveTrack* Make_Helixtrack(TEveTrackPropagator* prop, TVector3 pstart, TVector3 pend ,int sign);
     void DrawTrack(TVirtualGeoTrack *track);
@@ -203,6 +211,7 @@ private:
     double fvolTransparency;
     TString fgentleGeoName;
     TString frawGeoName;
+    std::map<int, int> fTrkColor;
 };
 
 

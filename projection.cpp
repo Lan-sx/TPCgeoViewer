@@ -20,6 +20,7 @@
 #include "MultiView.h"
 #include "RunManager.h"
 #include "GuiTable.h"
+#include "Bkgtrack.h"
 #include "Lansxlogon.h"
 
 #include <vector>
@@ -45,30 +46,57 @@ int main(int argc, char** argv)
     LansxFormat::myStyle();
     geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MM_CF_bugfix.root", "../../geodata/TPC_ModularEndcap_o1_v01_MM_CF_bugfix_Extract.root", 80., kTRUE);
     g->MakeMultiViewer();
-    //TVector3 p0(0., 59., 145.), p1(0., 1., 0.);
+
+    Bkgtrack bkgtracks("../../geodata/tracks_eeg.root");
+    //bkgtracks.PrintTrackInfo(2);
+    //bkgtracks.PlotPositionXYZDistribution(11, 0, true);
+    //bkgtracks.PlotGammaKEDistribution();
+    bkgtracks.FillMapstracks();
+    auto selectedtracks = bkgtracks.GetTrackMaps();
+    std::printf("[INFO]: Map size =%zu\n", selectedtracks.size());
+    g->PlotTracks(selectedtracks, 1);
+    
+    //calc secondary e- energy deposit
+    float sumEdep = 0.;
+    for (auto mapiter : selectedtracks)
+    {
+        for (auto trks : mapiter.second)
+        {
+            if (trks.pdg == 22)
+                continue;
+
+            for (size_t ipoint = 0; ipoint < trks.vxp.size(); ++ipoint)
+            {
+                auto radius = std::sqrt(std::pow(trks.vxp.at(ipoint), 2) + std::pow(trks.vyp.at(ipoint), 2));
+                auto position_z = trks.vzp.at(ipoint);
+                if (radius > _TPCR0 && radius < _TPCR1 && position_z > _TPCZ0 && position_z < _TPCZ1)
+                {
+                    sumEdep += trks.vde.at(ipoint);
+                }
+            }
+        }
+    }
+    std::printf("[INFO]: Total Energy Deposit=%.4f [MeV/BX]\n", sumEdep/10.);
+    //bkgtracks.PlotGammaKEDistribution();
+    // TVector3 p0(0., 120., 1.), p1(0.,0.,1.);
+    //g->GenMCHelixTrack(p0,p1,-3);
     //double xx = 0;
     //auto vecX0tables1 = g->Start_Track(p0, p1, kFALSE,xx);
     //GuiTable::ShowX0guiTable(vecX0tables1);
     //std::cout << "======> " << xx << std::endl;
-    auto h1 = g->GetXoverX0vsTheta();
-    auto myc = new TCanvas("myc", "myc", 800, 600);
-    myc->SetGrid();
-    h1->SetStats(kFALSE);
-    LansxFormat::FormatAll(h1, "%a %g", kMagenta, kMagenta);
-    h1->Draw("HIST");
-    // 
-
-
-    //p1[1] = 1.; p1[2] = 2.;
-    //auto vecX0table2 =g->Start_Track(p0, p1, kTRUE);
-    //GuiTable::ShowX0guiTable(vecX0table2);
+    //g->TurnOffDrawTrack();
+    //auto h1 = g->GetXoverX0vsTheta();
+    //auto myc = new TCanvas("myc", "myc", 800, 600);
+    //myc->SetGrid();
+    //h1->SetStats(kFALSE);
+    //LansxFormat::FormatAll(h1, "%a %g", kMagenta, kMagenta);
+    //h1->Draw("HIST");
 
 
     //load a helix track from Garfield++ 
-    //g->LoadMCHelix("./IonInfoproton_0GeV_TDR_0.0500pad_2T_0.20.root");
+    //g->LoadMCHelix("../../geodata/TPCtracks00000.root");
     //g->DrawGeoinOGL();
     
-
     std::printf("============================== Code End!\n");
     app.Run(kTRUE);
     //return 0;
