@@ -26,7 +26,6 @@ Bkgtrack::~Bkgtrack()
     delete f_Tf;
 }
 
-
 void Bkgtrack::InitialPars()
 {
     f_Tr->SetBranchAddress("pdgcode", &fPDG);
@@ -69,7 +68,6 @@ std::vector<size_t> Bkgtrack::CrossTPCIdx()
     return vCrossTPCidx;
 }
 
-
 void Bkgtrack::PrintTrackInfo(int numofentries)
 {
     if (f_Tr->GetEntries() < 1)
@@ -85,6 +83,45 @@ void Bkgtrack::PrintTrackInfo(int numofentries)
                 fStepkE->at(step_i), fStepde->at(step_i), fStepproc->at(step_i).data());
         }
     }
+}
+
+TCanvas* Bkgtrack::PlotGammaPositionDistribution()
+{
+    if (fMaptracks.size() == 0)
+    {
+        std::printf("[WARNING]: fMaptracks size==0, FilleegtrackMap first\n");
+        return nullptr;
+    }
+    auto hEvsZ = new TH2D("hPosEvsPz", ";Z [cm];kE of #gamma [MeV];",  800, -400, 400, 200, 0, 10);
+    hEvsZ->SetStats(0);
+    auto hPosz = new TH1D("hPosz", ";Z [cm];", 800, -400, 400);
+    //hPosz->SetStats(0);
+    int tmpcnt = 0;
+    for (const auto itemmap : fMaptracks)
+    {
+        auto iter = std::next(itemmap.second.begin(), 1);
+        tmpcnt++;
+        if (iter != itemmap.second.end())
+        {
+            hPosz->Fill(iter->vzp.at(0) / 10.);
+            //hPosxy->Fill(iter->vxp.at(0) / 10., iter->vyp.at(0) / 10.);
+            hEvsZ->Fill(iter->vzp.at(0) / 10., iter->e0);
+            if (tmpcnt < 40)
+                std::printf("[DEBUG]:  pdg:%d, trkid:%d, parentid:%d\n", iter->pdg, iter->trkid, iter->parentid);
+        }
+    }
+
+    auto myc = new TCanvas("Cgammaposition", "Cgammaposition", 1200, 600);
+    myc->Divide(2, 1);
+    myc->cd(1);
+    gPad->SetLogz();
+    gPad->SetGrid();
+    hEvsZ->Draw("COL");
+    myc->cd(2);
+    gPad->SetGrid();
+    hPosz->Draw();
+
+    return myc;
 }
 
 TCanvas* Bkgtrack::PlotPositionXYZDistribution(int pdg, int plane, bool Isstart)
@@ -150,6 +187,8 @@ void Bkgtrack::FilleegtrackMap()
 
     for (long long ii = 0; ii < f_Tr->GetEntries(); ++ii)
     {
+        if (ii % 200000 == 0)
+            std::printf("[INFO]: %lld entries read!\n", ii);
         f_Tr->GetEntry(ii);
         // Step I, check particle name
         if (fPDG == 22)
@@ -203,6 +242,7 @@ void Bkgtrack::FilleegtrackMap()
                     tmpeeg.pdg = fPDG;
                     tmpeeg.parentid = fParentid;
                     tmpeeg.trkid = fTrkid;
+                    tmpeeg.e0 = fStepkE->at(0);
                     tmpeeg.vxp = (*fStepx);
                     tmpeeg.vyp = (*fStepy);
                     tmpeeg.vzp = (*fStepz);
@@ -236,6 +276,7 @@ void Bkgtrack::FilleegtrackMap()
             tmpeeg.pdg = fPDG;
             tmpeeg.trkid = fTrkid;
             tmpeeg.parentid = fParentid;
+            tmpeeg.e0 = fStepkE->at(0);
             tmpeeg.vxp = (*fStepx);
             tmpeeg.vyp = (*fStepy);
             tmpeeg.vzp = (*fStepz);
@@ -251,6 +292,7 @@ void Bkgtrack::FilleegtrackMap()
             tmpeeg1.pdg = fPDG;
             tmpeeg1.trkid = fTrkid;
             tmpeeg1.parentid = fParentid;
+            tmpeeg1.e0 = fStepkE->at(0);
             tmpeeg1.vxp = (*fStepx);
             tmpeeg1.vyp = (*fStepy);
             tmpeeg1.vzp = (*fStepz);
@@ -289,10 +331,14 @@ TCanvas* Bkgtrack::PlotGammaKEDistribution()
     return myc;
 }
 
-
 float Bkgtrack::GetEDepbyelectronInTPC(int BX)
 {
     float sumEdep = 0.;
+    if (fMaptracks.size() == 0)
+    {
+        std::printf("[WARNING]: fMaptracks size==0, FilleegtrackMap first\n");
+        return 0.;
+    }
     for (auto mapiter : fMaptracks)
     {
         auto iter_trks = mapiter.second.begin();
@@ -314,4 +360,30 @@ float Bkgtrack::GetEDepbyelectronInTPC(int BX)
     }
 
     return sumEdep / BX;
+}
+
+const std::map<int, std::list<tracks_eeg>> Bkgtrack::GetPrimaryParticleMaps()
+{
+    std::map<int, std::list<tracks_eeg>> PrieeMaps;
+    for (long long ii = 0; ii < f_Tr->GetEntries(); ++ii)
+    {
+        if (ii % 200000 == 0)
+            std::printf("[INFO]: %lld entries read!\n", ii);
+        f_Tr->GetEntry(ii);
+        if (fParentid == 0)
+        {
+            tracks_eeg tmpeeg;
+            tmpeeg.pdg = fPDG;
+            tmpeeg.parentid = fParentid;
+            tmpeeg.trkid = fTrkid;
+            tmpeeg.e0 = fStepkE->at(0);
+            tmpeeg.vxp = (*fStepx);
+            tmpeeg.vyp = (*fStepy);
+            tmpeeg.vzp = (*fStepz);
+            tmpeeg.vde = (*fStepde);
+            PrieeMaps[fTrkid].push_back(tmpeeg);
+        }
+    }
+
+    return PrieeMaps;
 }

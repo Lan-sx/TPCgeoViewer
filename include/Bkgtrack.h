@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <numeric>
 #include <list>
+#include <iterator>
 
 //ROOT CERN
 #include "TString.h"
@@ -34,6 +35,7 @@ struct tracks_eeg
     int pdg;
     int parentid;
     int trkid;
+    float e0;
     std::vector<float> vxp;
     std::vector<float> vyp;
     std::vector<float> vzp;
@@ -52,11 +54,13 @@ public:
     //Plot some histograms
     TCanvas* PlotPositionXYZDistribution(int pdg = 22, int plane=0, bool Isstart=true);
     TCanvas* PlotGammaKEDistribution();
+    TCanvas* PlotGammaPositionDistribution();
     
     float GetEDepbyelectronInTPC(int BX=10);
     bool IsinTPCgasRegion(float xx, float yy, float zz);
     void FilleegtrackMap();
     const std::map<int, std::list<tracks_eeg>>& GeteegTrackMaps() { return fMaptracks; };
+    const std::map<int, std::list<tracks_eeg>> GetPrimaryParticleMaps();
 
 protected:
     void InitialPars();
