@@ -44,16 +44,22 @@ int main(int argc, char** argv)
     //TRint app("app",&argc,argv);
     //extractGentle();
     LansxFormat::myStyle();
-    geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MM_CF_bugfix.root", "../../geodata/TPC_ModularEndcap_o1_v01_MM_CF_bugfix_Extract.root", 80., kTRUE);
-    g->MakeMultiViewer();
+    //geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MM_CF_bugfix.root", "../../geodata/TPC_ModularEndcap_o1_v01_MM_CF_bugfix_Extract.root", 80., kTRUE);
+    //g->MakeMultiViewer();
 
-    Bkgtrack bkgtracks("../../geodata/AlltracksWholeH241204.root");
+    Bkgtrack bkgtracks("../../geodata/AlltracksWholeLZ241204.root");
     //bkgtracks.PrintTrackInfo(2);
     //bkgtracks.PlotPositionXYZDistribution(11, 0, true);
     bkgtracks.FilleegtrackMap();
-    auto selectedtracks = bkgtracks.GeteegTrackMaps();
-    std::printf("[INFO]: Map size =%zu\n", selectedtracks.size());
-    g->PlotTracks(selectedtracks, 20);
+    bkgtracks.PlotGammaPositionDistribution();
+    //auto selectedtracks = bkgtracks.GeteegTrackMaps();
+    //std::printf("[INFO]: Map size =%zu\n", selectedtracks.size());
+    //g->PlotTracks(selectedtracks, 100,true);
+
+    //auto primaryeetracks = bkgtracks.GetPrimaryParticleMaps();
+    //std::printf("[INFO]: Map size =%zu\n", primaryeetracks.size());
+    //g->PlotTracks(primaryeetracks, 200);
+
     
     //print secondary e- (caused by gamma) energy deposit
     std::printf("[INFO]: Total Energy Deposit=%.4f [MeV/BX]\n", bkgtracks.GetEDepbyelectronInTPC());
