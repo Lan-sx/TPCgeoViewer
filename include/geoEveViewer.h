@@ -184,7 +184,7 @@ public:
     * Plot bkg gamma and secondary e+/e-
     *
     */
-    void PlotTracks(const std::map<int,std::vector<tracks_eeg>>& inputTrkMap, int maxtracks, bool onlyee=false);
+    void PlotTracks(const std::map<int,std::list<tracks_eeg>>& inputTrkMap, int maxtracks, bool onlyee=false);
 
 protected:
     TEveTrack* Make_Helixtrack(TEveTrackPropagator* prop, TVector3 pstart, TVector3 pend ,int sign);

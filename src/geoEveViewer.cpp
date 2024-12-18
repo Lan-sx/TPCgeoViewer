@@ -493,7 +493,7 @@ void geoEveViewer::GenMCHelixTrack(TVector3 pstart, TVector3 pend, double magB ,
 }
 
 //**********************************************************************
-void geoEveViewer::PlotTracks(const std::map<int, std::vector<tracks_eeg>>& inputTrkMap, int maxtracks, bool onlyee)
+void geoEveViewer::PlotTracks(const std::map<int, std::list<tracks_eeg>>& inputTrkMap, int maxtracks, bool onlyee)
 {
 
     int cnt_gammatrk = 0;
@@ -515,7 +515,12 @@ void geoEveViewer::PlotTracks(const std::map<int, std::vector<tracks_eeg>>& inpu
             trkline->SetLineStyle(1);
             trkline->SetLineWidth(1);
             trkline->SetRnrPoints(true);
-            std::printf("[INFO]: %d-th gamma with %zu secondary e-/e+, pdg=%d step size=%zu \n", item.first, item.second.size(),trks.pdg,trks.vxp.size());
+            //item.first -> trackid of gamma, which crosses TPC and interact with gas)
+            //item.second -> std::list<tracks_eeg> li: 
+            //                                       li.at(0),-> gamma tracks its (pdg, parentid, *xp,*yp,*zp,*de)
+            //                                       li.at(1) - vec.at(size-1), -> parent or daughter particle tracks of gamma
+            std::printf("[INFO]: gamma trkid %d with %zu parent/daughter, (pdg=%d, trkid=%d, parentid=%d ), step size=%zu \n", item.first, item.second.size(),trks.pdg,
+                                                                                                                               trks.trkid, trks.parentid,trks.vxp.size());
             for (size_t ipoint = 0; ipoint < trks.vxp.size(); ++ipoint)
             {
                 trkline->SetPoint(ipoint, trks.vxp.at(ipoint)/10.,
