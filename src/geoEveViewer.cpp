@@ -493,7 +493,7 @@ void geoEveViewer::GenMCHelixTrack(TVector3 pstart, TVector3 pend, double magB ,
 }
 
 //**********************************************************************
-void geoEveViewer::PlotTracks(const std::map<int, std::list<tracks_eeg>>& inputTrkMap, int maxtracks, bool onlyee)
+void geoEveViewer::PlotTracks(const std::map<int, std::list<tracks_eeg>>& inputTrkMap, int maxtracks, bool onlyee, bool onlyparent)
 {
 
     int cnt_gammatrk = 0;
@@ -504,10 +504,16 @@ void geoEveViewer::PlotTracks(const std::map<int, std::list<tracks_eeg>>& inputT
             break;
         cnt_gammatrk++;
         std::cout << "============> " << item.second.size() << std::endl;
+        int cntTobreak_ge = 0;
         for (auto trks : item.second)
         {
             if (trks.pdg == 22 && onlyee)
                 continue;
+
+            if (cntTobreak_ge >= 1 && onlyparent)
+                break;
+            cntTobreak_ge++;
+
             TEveLine* trkline = new TEveLine(trks.vxp.size());
             trkline->SetMainColor(fTrkColor[trks.pdg]);
             trkline->SetLineColor(fTrkColor[trks.pdg]);
