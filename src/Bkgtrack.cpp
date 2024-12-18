@@ -40,6 +40,17 @@ void Bkgtrack::InitialPars()
     f_Tr->SetBranchAddress("vStepproc", &fStepproc);
 }
 
+bool Bkgtrack::IsinTPCgasRegion(float xx, float yy, float zz)
+{
+    auto radius = std::sqrt(std::pow(xx, 2) + std::pow(yy, 2));
+    if (radius >= _TPCR0 && radius <= _TPCR1 && zz > _TPCZ0 && zz < _TPCZ1)
+    {
+        return true;
+    }
+    else
+        return false;
+}
+
 std::vector<size_t> Bkgtrack::CrossTPCIdx()
 {
     std::vector<size_t> vCrossTPCidx;
@@ -50,9 +61,7 @@ std::vector<size_t> Bkgtrack::CrossTPCIdx()
     bool isCrossTPC = false;
     for (size_t mm = 0; mm < fStepx->size(); ++mm)
     {
-        auto radius = std::sqrt(std::pow(fStepx->at(mm), 2) + std::pow(fStepy->at(mm), 2));
-        auto posZ = fStepz->at(mm);
-        if (radius >= _TPCR0 && radius <= _TPCR1 && posZ > _TPCZ0 && posZ < _TPCZ1)
+        if (IsinTPCgasRegion(fStepx->at(mm), fStepy->at(mm), fStepz->at(mm)))
         {
             vCrossTPCidx.push_back(mm);
         }
@@ -92,7 +101,7 @@ TCanvas* Bkgtrack::PlotPositionXYZDistribution(int pdg, int plane, bool Isstart)
 
     if (plane == 2)
     {
-        h2dxyz = new TH2D(Form("h2dxy_%d_%d", pdg, plane), hist_titile.c_str(), 720/2, -180, 180, 720/2, -180, 180);
+        h2dxyz = new TH2D(Form("h2dxy_%d_%d", pdg, plane), hist_titile.c_str(), 400, -200, 200, 400, -200, 200);
     }
     else
     {
@@ -130,18 +139,14 @@ TCanvas* Bkgtrack::PlotPositionXYZDistribution(int pdg, int plane, bool Isstart)
     return myc;
 }
 
-void Bkgtrack::FillMapstracks()
+void Bkgtrack::FilleegtrackMap()
 {
-
-    //myc->SetGrid();
     hKineticE0 = new TH1D("hKE0", "Initial kE of #gamma (interact with gas);kE [MeV];", 400, 0, 20.); // 
     hKineticE1 = new TH1D("hKE1", "The first step kE in TPC;kE [MeV];", 400, 0, 20.);
     hKineticE2 = new TH1D("hKE2", "Initial kE of #gamma, just cross TPC;kE [MeV];", 400, 0, 20.);
     hKineticE3 = new TH1D("hKE3", "Initial kE of #gamma, start in TPC;kE [MeV];", 400, 0, 20.);
 
     long Count1(0), Count2(0), Count3(0);
-    //std::map<int,int>;
-    
 
     for (long long ii = 0; ii < f_Tr->GetEntries(); ++ii)
     {
@@ -151,7 +156,7 @@ void Bkgtrack::FillMapstracks()
         {
             Count1++;
             // Step II, check position
-            auto vCrosstpc = CrossTPCIdx();
+            auto vCrosstpc = this->CrossTPCIdx();
             if (vCrosstpc.size() != 0)
             {
                 Count2++;
@@ -197,11 +202,13 @@ void Bkgtrack::FillMapstracks()
                     tracks_eeg tmpeeg;
                     tmpeeg.pdg = fPDG;
                     tmpeeg.parentid = fParentid;
+                    tmpeeg.trkid = fTrkid;
                     tmpeeg.vxp = (*fStepx);
                     tmpeeg.vyp = (*fStepy);
                     tmpeeg.vzp = (*fStepz);
                     tmpeeg.vde = (*fStepde);
                     fMaptracks[fTrkid].push_back(tmpeeg);
+                    fMapParentTrkofGamma[fParentid] = fTrkid;
                     //vTmptrkid.push_back(fTrkid);
                 }
                 
@@ -217,7 +224,6 @@ void Bkgtrack::FillMapstracks()
     }
 
     std::printf("[INFO]: There are %ld gamma tracks, %ld crossed TPC region, %ld loss energy in TPC region\n", Count1, Count2, Count3);
-    //std::printf("[INFO]: Map size = %zu\n", fMaptracks.size());
 
     //fill secondary e-/e+ tracks into fMaptracks
     for (long long ii = 0; ii < f_Tr->GetEntries(); ++ii)
@@ -226,16 +232,30 @@ void Bkgtrack::FillMapstracks()
         auto iter = fMaptracks.find(fParentid);
         if (iter != fMaptracks.end())
         {
-            //fMaptracks[fParentid].
             tracks_eeg tmpeeg;
             tmpeeg.pdg = fPDG;
+            tmpeeg.trkid = fTrkid;
             tmpeeg.parentid = fParentid;
             tmpeeg.vxp = (*fStepx);
             tmpeeg.vyp = (*fStepy);
             tmpeeg.vzp = (*fStepz);
             tmpeeg.vde = (*fStepde);
             iter->second.push_back(tmpeeg);
-            //std::cout << " AAAAAAAAAAAAAAAA FIND" << std::endl;
+        }
+        
+        auto iter1 = fMapParentTrkofGamma.find(fTrkid);
+        if (iter1 != fMapParentTrkofGamma.end())
+        {
+            int gammatrkid = iter1->second;
+            tracks_eeg tmpeeg1;
+            tmpeeg1.pdg = fPDG;
+            tmpeeg1.trkid = fTrkid;
+            tmpeeg1.parentid = fParentid;
+            tmpeeg1.vxp = (*fStepx);
+            tmpeeg1.vyp = (*fStepy);
+            tmpeeg1.vzp = (*fStepz);
+            tmpeeg1.vde = (*fStepde);
+            fMaptracks[gammatrkid].push_front(tmpeeg1);
         }
     }
 }
@@ -267,4 +287,31 @@ TCanvas* Bkgtrack::PlotGammaKEDistribution()
 
 
     return myc;
+}
+
+
+float Bkgtrack::GetEDepbyelectronInTPC(int BX)
+{
+    float sumEdep = 0.;
+    for (auto mapiter : fMaptracks)
+    {
+        auto iter_trks = mapiter.second.begin();
+        //skip parent particle
+        iter_trks++;
+        for (; iter_trks != mapiter.second.end(); ++iter_trks)
+        {
+            if ((iter_trks->pdg) != 22)
+            {
+                for (size_t ipoint = 0; ipoint < (iter_trks->vxp).size(); ++ipoint)
+                {
+                    if (IsinTPCgasRegion((iter_trks->vxp).at(ipoint), (iter_trks->vyp).at(ipoint), (iter_trks->vzp).at(ipoint)))
+                    {
+                        sumEdep += (iter_trks->vde).at(ipoint);
+                    }
+                }
+            }
+        }
+    }
+
+    return sumEdep / BX;
 }
