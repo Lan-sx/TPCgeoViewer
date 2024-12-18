@@ -47,36 +47,18 @@ int main(int argc, char** argv)
     geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MM_CF_bugfix.root", "../../geodata/TPC_ModularEndcap_o1_v01_MM_CF_bugfix_Extract.root", 80., kTRUE);
     g->MakeMultiViewer();
 
-    Bkgtrack bkgtracks("../../geodata/tracks_eeg.root");
+    Bkgtrack bkgtracks("../../geodata/AlltracksWholeH241204.root");
     //bkgtracks.PrintTrackInfo(2);
     //bkgtracks.PlotPositionXYZDistribution(11, 0, true);
-    //bkgtracks.PlotGammaKEDistribution();
-    bkgtracks.FillMapstracks();
-    auto selectedtracks = bkgtracks.GetTrackMaps();
+    bkgtracks.FilleegtrackMap();
+    auto selectedtracks = bkgtracks.GeteegTrackMaps();
     std::printf("[INFO]: Map size =%zu\n", selectedtracks.size());
-    g->PlotTracks(selectedtracks, 1);
+    g->PlotTracks(selectedtracks, 20);
     
-    //calc secondary e- energy deposit
-    float sumEdep = 0.;
-    for (auto mapiter : selectedtracks)
-    {
-        for (auto trks : mapiter.second)
-        {
-            if (trks.pdg == 22)
-                continue;
-
-            for (size_t ipoint = 0; ipoint < trks.vxp.size(); ++ipoint)
-            {
-                auto radius = std::sqrt(std::pow(trks.vxp.at(ipoint), 2) + std::pow(trks.vyp.at(ipoint), 2));
-                auto position_z = trks.vzp.at(ipoint);
-                if (radius > _TPCR0 && radius < _TPCR1 && position_z > _TPCZ0 && position_z < _TPCZ1)
-                {
-                    sumEdep += trks.vde.at(ipoint);
-                }
-            }
-        }
-    }
-    std::printf("[INFO]: Total Energy Deposit=%.4f [MeV/BX]\n", sumEdep/10.);
+    //print secondary e- (caused by gamma) energy deposit
+    std::printf("[INFO]: Total Energy Deposit=%.4f [MeV/BX]\n", bkgtracks.GetEDepbyelectronInTPC());
+    
+    //bkgtracks.PlotPositionXYZDistribution(22, 2, true);
     //bkgtracks.PlotGammaKEDistribution();
     // TVector3 p0(0., 120., 1.), p1(0.,0.,1.);
     //g->GenMCHelixTrack(p0,p1,-3);
