@@ -1,5 +1,7 @@
 #include "Bkgtrack.h"
 #include "TMath.h"
+#include "TAxis.h"
+#include "TVector3.h"
 
 Bkgtrack::Bkgtrack(TString tracksfile) : fTrkid(0),fParentid(0),fPDG(11),
                                          fStepx(nullptr),fStepy(nullptr),fStepz(nullptr),
@@ -85,6 +87,53 @@ void Bkgtrack::PrintTrackInfo(int numofentries)
     }
 }
 
+TCanvas* Bkgtrack::PlotParticleType()
+{
+    std::map<int, int> particleInTPC{ {22,0},  {11,0},  {-11,0},
+                                      {13,0},  {-13,0}, {211,0},
+                                      {-211,0},{321,0}, {-321,0},
+                                      {2212,0}, {2112,0}};
+    auto hParticleType = new TH1D("hParticleType", ";;Cnts", 11, 0, 11);
+    //int count_unknown = 0;
+    for (long long ii = 0; ii < f_Tr->GetEntries(); ++ii)
+    {
+        f_Tr->GetEntry(ii);
+        if (ii % 200000 == 0)
+            std::printf("[INFO]: %lld entries read!\n", ii);
+        
+        // Step I, checking is current track cross TPC
+        auto vCrosstpc = this->CrossTPCIdx();
+        if (vCrosstpc.size() > 0)
+        {
+            particleInTPC[fPDG]++;
+            //if (iter != particleInTPC.end())
+            //{
+            //    iter->second++;
+            //}
+            //else
+            //    count_unknown++;
+        }
+
+    }
+
+    const char* particlename[11] = { "#gamma","e^{-}","e^{+}","#mu^{-}","#mu^{+}",
+                                     "#pi^{+}","#pi^{-}","K^{+}","K^{-}","#it{p}","#it{n}"};
+
+    hParticleType->Fill(particlename[0], particleInTPC[22]);
+    hParticleType->Fill(particlename[1], particleInTPC[11]);
+    hParticleType->Fill(particlename[2], particleInTPC[-11]);
+
+    //std::printf("[WARNING]: %d tracks unknown!\n", count_unknown);
+    auto myc = new TCanvas("CparticleType", "CparticleType", 800, 600);
+    myc->SetGrid();
+    myc->SetLogy();
+    hParticleType->SetStats(0);
+    hParticleType->GetXaxis()->SetLabelSize(0.08);
+    hParticleType->Draw("HIST");
+
+    return myc;
+}
+
 TCanvas* Bkgtrack::PlotGammaPositionDistribution()
 {
     if (fMaptracks.size() == 0)
@@ -120,6 +169,54 @@ TCanvas* Bkgtrack::PlotGammaPositionDistribution()
     myc->cd(2);
     gPad->SetGrid();
     hPosz->Draw();
+
+    return myc;
+}
+
+TCanvas* Bkgtrack::PlotGammaDirectionDistribution()
+{
+    if (fMaptracks.size() == 0)
+    {
+        std::printf("[WARNING]: fMaptracks size==0, FilleegtrackMap first\n");
+        return nullptr;
+    }
+
+    auto hCosvsZ = new TH2D("hCosEvsPz", ";Z [cm];cos#theta;", 800, -400, 400, 40, -1, 1);
+    hCosvsZ->SetStats(0);
+    int tmpcnt = 0;
+    for (const auto itemmap : fMaptracks)
+    {
+        auto iter = std::next(itemmap.second.begin(), 1);
+        tmpcnt++;
+        if (iter != itemmap.second.end())
+        {
+            if (iter->vxp.size() >= 2)
+            {
+                auto xp0 = iter->vxp.at(0);
+                auto yp0 = iter->vyp.at(0);
+                auto zp0 = iter->vzp.at(0);
+                TVector3 p0(xp0, yp0, zp0);
+                auto xp1 = iter->vxp.at(1);
+                auto yp1 = iter->vyp.at(1);
+                auto zp1 = iter->vzp.at(1);
+                TVector3 p1(xp1, yp1, zp1);
+
+                auto vdirect = p1 - p0;
+                auto costheta = vdirect.z() / vdirect.Mag();
+
+                hCosvsZ->Fill(zp0/10., costheta);
+                if (tmpcnt < 20)
+                    std::printf("[DEBUG]:  pdg:%d, trkid:%d, parentid:%d costheta=%.2f\n", iter->pdg, iter->trkid, iter->parentid,costheta);
+            }
+            //hEvsZ->Fill(iter->vzp.at(0) / 10., iter->e0);
+            
+        }
+    }
+
+
+    auto myc = new TCanvas("Ccosvsz", "Ccosvsz", 800, 600);
+    myc->SetGrid();
+    hCosvsZ->Draw("COL");
 
     return myc;
 }
