@@ -503,7 +503,7 @@ void geoEveViewer::PlotTracks(const std::map<int, std::list<tracks_eeg>>& inputT
         if (cnt_gammatrk >= maxtracks)
             break;
         cnt_gammatrk++;
-        std::cout << "============> " << item.second.size() << std::endl;
+        //std::cout << "============> " << item.second.size() << std::endl;
         int cntTobreak_ge = 0;
         for (auto trks : item.second)
         {
