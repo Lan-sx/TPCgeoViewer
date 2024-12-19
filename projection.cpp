@@ -51,19 +51,19 @@ int main(int argc, char** argv)
     //bkgtracks.PrintTrackInfo(2);
     //bkgtracks.PlotPositionXYZDistribution(11, 0, true);
     bkgtracks.FilleegtrackMap();
-    bkgtracks.PlotGammaPositionDistribution();
+    //bkgtracks.PlotGammaPositionDistribution();
     //auto selectedtracks = bkgtracks.GeteegTrackMaps();
     //std::printf("[INFO]: Map size =%zu\n", selectedtracks.size());
     //g->PlotTracks(selectedtracks, 100,true);
-
+    bkgtracks.PlotGammaDirectionDistribution();
     //auto primaryeetracks = bkgtracks.GetPrimaryParticleMaps();
     //std::printf("[INFO]: Map size =%zu\n", primaryeetracks.size());
     //g->PlotTracks(primaryeetracks, 200);
 
     
     //print secondary e- (caused by gamma) energy deposit
-    std::printf("[INFO]: Total Energy Deposit=%.4f [MeV/BX]\n", bkgtracks.GetEDepbyelectronInTPC());
-    
+    //std::printf("[INFO]: Total Energy Deposit=%.4f [MeV/BX]\n", bkgtracks.GetEDepbyelectronInTPC());
+    //bkgtracks.PlotParticleType();
     //bkgtracks.PlotPositionXYZDistribution(22, 2, true);
     //bkgtracks.PlotGammaKEDistribution();
     // TVector3 p0(0., 120., 1.), p1(0.,0.,1.);
