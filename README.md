@@ -8,6 +8,26 @@ A tool for CEPC_TPC geo visualization based on [`ROOT Event Dispaly`](https://ro
 + CMake
 + Platform: Win10/11 + VS2022, Linux
 
+## Install
+### Linux terminal
+```
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make -jN
+$ ./EventDisplay
+```
+### Window terminal
+```
+$ mkdir build
+$ cd build
+$ cmake -G "Visual Studio 17 2022"
+$ cmake --build . --config Release
+$ cd Release
+$ .\EventDisplay.exe
+```
+### Window cmake gui
+
 ## TPC Geometry overview
 ![TPC Geo](./TPC_geo.png)
 
