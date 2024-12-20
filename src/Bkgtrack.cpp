@@ -134,29 +134,48 @@ TCanvas* Bkgtrack::PlotParticleType()
     return myc;
 }
 
-TCanvas* Bkgtrack::PlotGammaPositionDistribution()
+TCanvas* Bkgtrack::PlotGammaPositionDistribution(bool IsAll)
 {
-    if (fMaptracks.size() == 0)
-    {
-        std::printf("[WARNING]: fMaptracks size==0, FilleegtrackMap first\n");
-        return nullptr;
-    }
-    auto hEvsZ = new TH2D("hPosEvsPz", ";Z [cm];kE of #gamma [MeV];",  800, -400, 400, 200, 0, 10);
+    auto hEvsZ = new TH2D("hPosEvsPz", ";Z [cm];kE of #gamma [MeV];", 800, -400, 400, 200, 0, 10);
     hEvsZ->SetStats(0);
     auto hPosz = new TH1D("hPosz", ";Z [cm];", 800, -400, 400);
     //hPosz->SetStats(0);
-    int tmpcnt = 0;
-    for (const auto itemmap : fMaptracks)
+    if (!IsAll)
     {
-        auto iter = std::next(itemmap.second.begin(), 1);
-        tmpcnt++;
-        if (iter != itemmap.second.end())
+        if (fMaptracks.size() == 0)
         {
-            hPosz->Fill(iter->vzp.at(0) / 10.);
-            //hPosxy->Fill(iter->vxp.at(0) / 10., iter->vyp.at(0) / 10.);
-            hEvsZ->Fill(iter->vzp.at(0) / 10., iter->e0);
-            if (tmpcnt < 40)
-                std::printf("[DEBUG]:  pdg:%d, trkid:%d, parentid:%d\n", iter->pdg, iter->trkid, iter->parentid);
+            std::printf("[WARNING]: fMaptracks size==0, FilleegtrackMap first\n");
+            return nullptr;
+        }
+        int tmpcnt = 0;
+        for (const auto itemmap : fMaptracks)
+        {
+            auto iter = std::next(itemmap.second.begin(), 1);
+            tmpcnt++;
+            if (iter != itemmap.second.end())
+            {
+                hPosz->Fill(iter->vzp.at(0) / 10.);
+                //hPosxy->Fill(iter->vxp.at(0) / 10., iter->vyp.at(0) / 10.);
+                hEvsZ->Fill(iter->vzp.at(0) / 10., iter->e0);
+                if (tmpcnt < 40)
+                    std::printf("[DEBUG]:  pdg:%d, trkid:%d, parentid:%d\n", iter->pdg, iter->trkid, iter->parentid);
+            }
+        }
+    }
+    else
+    {
+        for (long long ii = 0; ii < f_Tr->GetEntries(); ++ii)
+        {
+            if (ii % 200000 == 0)
+                std::printf("[INFO]: %lld entries read!\n", ii);
+            f_Tr->GetEntry(ii);
+            
+            auto vcrosstpc = CrossTPCIdx();
+            if (vcrosstpc.size() > 0 && fPDG==22)
+            {
+                hPosz->Fill(fStepz->at(0) / 10.);
+                hEvsZ->Fill(fStepz->at(0) / 10., fStepkE->at(0));
+            }
         }
     }
 
@@ -171,53 +190,96 @@ TCanvas* Bkgtrack::PlotGammaPositionDistribution()
     hPosz->Draw();
 
     return myc;
+
 }
 
-TCanvas* Bkgtrack::PlotGammaDirectionDistribution()
+TCanvas* Bkgtrack::PlotGammaDirectionDistribution(bool IsAll)
 {
-    if (fMaptracks.size() == 0)
-    {
-        std::printf("[WARNING]: fMaptracks size==0, FilleegtrackMap first\n");
-        return nullptr;
-    }
-
     auto hCosvsZ = new TH2D("hCosEvsPz", ";Z [cm];cos#theta;", 800, -400, 400, 40, -1, 1);
     hCosvsZ->SetStats(0);
-    int tmpcnt = 0;
-    for (const auto itemmap : fMaptracks)
+    auto hPhivsZ = new TH2D("hPhivsZ", ";Z [cm]; #Phi [Degree]", 800, -400, 400, 360, -180, 180);
+    //auto hPhi = new TH1D("hPhi", ";#Phi [Degree];Cnts", 360, -180, 180);
+    //hPhi->SetStats(0);
+
+    if (!IsAll)
     {
-        auto iter = std::next(itemmap.second.begin(), 1);
-        tmpcnt++;
-        if (iter != itemmap.second.end())
+        if (fMaptracks.size() == 0)
         {
-            if (iter->vxp.size() >= 2)
+            std::printf("[WARNING]: fMaptracks size==0, FilleegtrackMap first\n");
+            return nullptr;
+        }
+
+        int tmpcnt = 0;
+        for (const auto itemmap : fMaptracks)
+        {
+            auto iter = std::next(itemmap.second.begin(), 1);
+            tmpcnt++;
+            if (iter != itemmap.second.end())
             {
-                auto xp0 = iter->vxp.at(0);
-                auto yp0 = iter->vyp.at(0);
-                auto zp0 = iter->vzp.at(0);
-                TVector3 p0(xp0, yp0, zp0);
-                auto xp1 = iter->vxp.at(1);
-                auto yp1 = iter->vyp.at(1);
-                auto zp1 = iter->vzp.at(1);
-                TVector3 p1(xp1, yp1, zp1);
+                if (iter->vxp.size() >= 2)
+                {
+                    auto xp0 = iter->vxp.at(0);
+                    auto yp0 = iter->vyp.at(0);
+                    auto zp0 = iter->vzp.at(0);
+                    TVector3 p0(xp0, yp0, zp0);
+                    auto xp1 = iter->vxp.at(1);
+                    auto yp1 = iter->vyp.at(1);
+                    auto zp1 = iter->vzp.at(1);
+                    TVector3 p1(xp1, yp1, zp1);
+
+                    auto vdirect = p1 - p0;
+                    auto costheta = vdirect.z() / vdirect.Mag();
+
+                    auto phi = TMath::ATan2(vdirect.y(), vdirect.x())*TMath::RadToDeg();
+
+                    hCosvsZ->Fill(zp0 / 10., costheta);
+                    hPhivsZ->Fill(zp0 / 10, phi);
+                    //hPhi->Fill(phi);
+                    if (tmpcnt < 20)
+                        std::printf("[DEBUG]:  pdg:%d, trkid:%d, parentid:%d costheta=%.2f\n", iter->pdg, iter->trkid, iter->parentid, costheta);
+                }
+                //hEvsZ->Fill(iter->vzp.at(0) / 10., iter->e0);
+
+            }
+        }
+    }
+    else
+    {
+        for (long long ii = 0; ii < f_Tr->GetEntries(); ++ii)
+        {
+            if (ii % 200000 == 0)
+                std::printf("[INFO]: %lld entries read!\n", ii);
+            f_Tr->GetEntry(ii);
+
+            auto vcrosstpc = CrossTPCIdx();
+            if (vcrosstpc.size() >=2 && fPDG == 22)
+            {
+                TVector3 p0(fStepx->at(0), fStepy->at(0), fStepz->at(0));
+                TVector3 p1(fStepx->at(1), fStepy->at(1), fStepz->at(1));
 
                 auto vdirect = p1 - p0;
                 auto costheta = vdirect.z() / vdirect.Mag();
 
-                hCosvsZ->Fill(zp0/10., costheta);
-                if (tmpcnt < 20)
-                    std::printf("[DEBUG]:  pdg:%d, trkid:%d, parentid:%d costheta=%.2f\n", iter->pdg, iter->trkid, iter->parentid,costheta);
+                hCosvsZ->Fill(fStepz->at(0) / 10., costheta);
+                auto phi = TMath::ATan2(vdirect.y(), vdirect.x()) * TMath::RadToDeg();
+                hPhivsZ->Fill(fStepz->at(0) / 10., phi);
+                //hPhi->Fill(phi);
             }
-            //hEvsZ->Fill(iter->vzp.at(0) / 10., iter->e0);
-            
         }
     }
 
 
-    auto myc = new TCanvas("Ccosvsz", "Ccosvsz", 800, 600);
-    myc->SetGrid();
+    auto myc = new TCanvas("Ccosvsz", "Ccosvsz", 1200, 400);
+    myc->Divide(2, 1);
+    myc->cd(1);
+    gPad->SetGrid();
+    //myc->SetLogz();
     hCosvsZ->Draw("COL");
-
+    myc->cd(2);
+    gPad->SetGridx();
+    gPad->SetLogz();
+    //hPhi->Draw();
+    hPhivsZ->Draw("COL");
     return myc;
 }
 
