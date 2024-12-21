@@ -342,7 +342,8 @@ bool geoEveViewer::ExtractGentleVolume(TString inputfileName, TString outputfile
         return kFALSE;
     std::cout << "==================" << std::endl;
 
-    auto topnode = geoman->GetTopVolume()->FindNode("TPC_envelope_0");
+    //auto topnode = geoman->GetTopVolume()->FindNode("TPC_envelope_0");
+    auto topnode = geoman->GetTopNode();
     auto evetopnode = new TEveGeoTopNode(geoman, topnode);
     evetopnode->SetVisLevel(level);
     evem->AddGlobalElement(evetopnode);
