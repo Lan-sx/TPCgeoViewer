@@ -22,7 +22,11 @@ Bkgtrack::Bkgtrack(TString tracksfile) : fTrkid(0),fParentid(0),fPDG(11),
 
 Bkgtrack::~Bkgtrack()
 {
-    delete fStepx, fStepy, fStepz, fStepkE, fStepde;
+    delete fStepx;
+    delete fStepy; 
+    delete fStepz; 
+    delete fStepkE; 
+    delete fStepde;
     delete fStepproc;
     delete f_Tr;
     delete f_Tf;
@@ -122,6 +126,8 @@ TCanvas* Bkgtrack::PlotParticleType()
     hParticleType->Fill(particlename[0], particleInTPC[22]);
     hParticleType->Fill(particlename[1], particleInTPC[11]);
     hParticleType->Fill(particlename[2], particleInTPC[-11]);
+    hParticleType->Fill(particlename[9], particleInTPC[2212]);
+    hParticleType->Fill(particlename[10], particleInTPC[2112]);
 
     //std::printf("[WARNING]: %d tracks unknown!\n", count_unknown);
     auto myc = new TCanvas("CparticleType", "CparticleType", 800, 600);
