@@ -39,7 +39,7 @@ geoEveViewer::geoEveViewer(TString rawGeofile, TString geoGentlefile, double vol
     geo_manager = TGeoManager::Import(rawGeofile.Data());
     if (!geo_manager)
     {
-        std::printf("====> % s can not found!\n", rawGeofile.Data());
+        std::printf("====> %s can not found!\n", rawGeofile.Data());
         gSystem->Exit(-1);
     }
 
