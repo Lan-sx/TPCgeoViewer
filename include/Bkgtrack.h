@@ -29,7 +29,7 @@ constexpr double _TPCR1 = 1750.; // [mm]
 constexpr double _TPCZ0 = -2750.; // [mm]
 constexpr double _TPCZ1 = -_TPCZ0;// [mm]
 
-const std::array<std::string, 5> _ProcName {"initStep","Transportation","compt","phot","conv"};
+const std::array<std::string, 6> _ProcName {"initStep","Transportation","compt","phot","conv","Rayl"};
 
 struct tracks_eeg
 {

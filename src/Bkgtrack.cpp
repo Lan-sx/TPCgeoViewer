@@ -365,7 +365,7 @@ void Bkgtrack::FilleegtrackMap()
             {
                 Count2++;
                 //Step III, check proc... of gamma in tpc
-                int cnt_compt(0), cnt_phot(0), cnt_conv(0),cnt_init(0),cnt_transportation(0);
+                int cnt_compt(0), cnt_phot(0), cnt_conv(0),cnt_init(0),cnt_transportation(0),cnt_rayl(0);
                 for (size_t nn = 0; nn < vCrosstpc.size(); ++nn)
                 {
                     std::string ProcinTPC = fStepproc->at(vCrosstpc.at(nn));
@@ -387,6 +387,8 @@ void Bkgtrack::FilleegtrackMap()
                         }
                         else if (proc_idx == 0)
                             cnt_init++;
+                        else if (proc_idx == 5)
+                            cnt_rayl++;
                         else
                             cnt_transportation++;
                     }
@@ -398,7 +400,7 @@ void Bkgtrack::FilleegtrackMap()
                 
                 // Fill hists
                 // case I, gamma crossed TPC gas region and interact with gas through compt phot or conv
-                if (cnt_compt != 0 || cnt_conv != 0 || cnt_phot != 0)
+                if (cnt_compt != 0 || cnt_conv != 0 || cnt_phot != 0 || cnt_rayl !=0)
                 {
                     hKineticE0->Fill(fStepkE->at(0));
                     hKineticE1->Fill(fStepkE->at(vCrosstpc.at(0)));
