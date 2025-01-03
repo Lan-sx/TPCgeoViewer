@@ -142,9 +142,9 @@ TCanvas* Bkgtrack::PlotParticleType()
 
 TCanvas* Bkgtrack::PlotGammaPositionDistribution(bool IsAll)
 {
-    auto hEvsZ = new TH2D("hPosEvsPz", ";Z [cm];kE of #gamma [MeV];", 800, -400, 400, 200, 0, 10);
+    auto hEvsZ = new TH2D("hPosEvsPz", ";Z [cm];kE of #gamma [MeV];", 1000, -500, 500, 200, 0, 10);
     hEvsZ->SetStats(0);
-    auto hPosz = new TH1D("hPosz", ";Z [cm];", 800, -400, 400);
+    auto hPosz = new TH1D("hPosz", ";Z [cm];", 1000, -500, 500);
     //hPosz->SetStats(0);
     if (!IsAll)
     {
@@ -201,9 +201,9 @@ TCanvas* Bkgtrack::PlotGammaPositionDistribution(bool IsAll)
 
 TCanvas* Bkgtrack::PlotGammaDirectionDistribution(bool IsAll)
 {
-    auto hCosvsZ = new TH2D("hCosEvsPz", ";Z [cm];cos#theta;", 800, -400, 400, 40, -1, 1);
+    auto hCosvsZ = new TH2D("hCosEvsPz", ";Z [cm];cos#theta;", 1000, -500, 500, 40, -1, 1);
     hCosvsZ->SetStats(0);
-    auto hPhivsZ = new TH2D("hPhivsZ", ";Z [cm]; #Phi [Degree]", 800, -400, 400, 360, -180, 180);
+    auto hPhivsZ = new TH2D("hPhivsZ", ";Z [cm]; #Phi [Degree]", 1000, -500, 500, 360, -180, 180);
     //auto hPhi = new TH1D("hPhi", ";#Phi [Degree];Cnts", 360, -180, 180);
     //hPhi->SetStats(0);
 
