@@ -343,10 +343,20 @@ TCanvas* Bkgtrack::PlotPositionXYZDistribution(int pdg, int plane, bool Isstart)
 
 void Bkgtrack::FilleegtrackMap()
 {
-    hKineticE0 = new TH1D("hKE0", "Initial kE of #gamma (interact with gas);kE [MeV];", 400, 0, 20.); // 
-    hKineticE1 = new TH1D("hKE1", "The first step kE in TPC;kE [MeV];", 400, 0, 20.);
-    hKineticE2 = new TH1D("hKE2", "Initial kE of #gamma, just cross TPC;kE [MeV];", 400, 0, 20.);
-    hKineticE3 = new TH1D("hKE3", "Initial kE of #gamma, start in TPC;kE [MeV];", 400, 0, 20.);
+    //Set Log10 x bin  
+    const double E_lowEdge = -3; // X-axis low edge -> 10^-3 [MeV] = 1 [keV]
+    const double E_upEdge = 2;   // X-axis up edge -> 10^2 [MeV] 
+    const int Ndiv = 20;
+    const int Nbins = static_cast<int>(E_upEdge - E_lowEdge) * Ndiv; // 1 keV to 100 MeV
+    double* Xaxisbins = new double[Nbins+1];
+    for (int ii = 0; ii <= Nbins; ++ii)
+    {
+        Xaxisbins[ii] = static_cast<double>(TMath::Power(10,E_lowEdge + (1./Ndiv)*ii));
+    }
+    hKineticE0 = new TH1D("hKE0", "Initial kE of #gamma (interact with gas);kE [MeV];", Nbins, Xaxisbins); 
+    hKineticE1 = new TH1D("hKE1", "The first step kE in TPC;kE [MeV];", Nbins, Xaxisbins);
+    hKineticE2 = new TH1D("hKE2", "Initial kE of #gamma, just cross TPC;kE [MeV];", Nbins, Xaxisbins);
+    hKineticE3 = new TH1D("hKE3", "Initial kE of #gamma, start in TPC;kE [MeV];", Nbins, Xaxisbins);
 
     long Count1(0), Count2(0), Count3(0);
 
@@ -476,21 +486,29 @@ TCanvas* Bkgtrack::PlotGammaKEDistribution()
 
     myc->cd(1);
     gPad->SetGrid();
+    gPad->SetLogx();
+    gPad->SetLogy();
     if(hKineticE2)
         hKineticE2->Draw();
 
     myc->cd(2);
     gPad->SetGrid();
+    gPad->SetLogx();
+    gPad->SetLogy();
     if(hKineticE0)
         hKineticE0->Draw();
 
     myc->cd(3);
     gPad->SetGrid();
+    gPad->SetLogx();
+    gPad->SetLogy();
     if(hKineticE1)
         hKineticE1->Draw();
 
     myc->cd(4);
     gPad->SetGrid();
+    gPad->SetLogx();
+    gPad->SetLogy();
     if(hKineticE3)
         hKineticE3->Draw();
 
