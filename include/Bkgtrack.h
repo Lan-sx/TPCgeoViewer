@@ -93,8 +93,6 @@ public:
     //                                                                          list[2] list[3]... -> its daughter particles
     void FilleegtrackMap();
 
-    // Get 
-
     // Get private track map `fMaptracks`
     const std::map<int, std::list<tracks_eeg>>& GeteegTrackMaps() { return fMaptracks; };
     
@@ -103,6 +101,12 @@ public:
     //                                                                        value: list[0] list[1] ... -> all primary particles
     const std::map<int, std::list<tracks_eeg>> GetPrimaryParticleMaps();
 
+    // Fill events Map
+    // std::map<int,std::list<tracks_eeg>> eventsMap
+    //                                     key -> MCparticle track id (primary tracks, parentid==0)
+    //                                     value -> list[0], list[1] ... -> all daughters of a MCparticle
+    const std::map<int, std::list<tracks_eeg>> GetEventsMap();
+    
 protected:
     void InitialPars();
     std::vector<size_t> CrossTPCIdx();

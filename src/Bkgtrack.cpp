@@ -572,3 +572,46 @@ const std::map<int, std::list<tracks_eeg>> Bkgtrack::GetPrimaryParticleMaps()
 
     return PrieeMaps;
 }
+
+
+const std::map<int, std::list<tracks_eeg>> Bkgtrack::GetEventsMap()
+{
+    using Trk = std::list<tracks_eeg>;
+    std::map<int, Trk> eventsMap;
+
+    for (long long ii = 0; ii < 20000; ++ii)
+    {
+        if (ii % 100 == 0)
+            std::printf("[INFO]: %lld entries read!\n", ii);
+        f_Tr->GetEntry(ii);
+        tracks_eeg track_ii = { fPDG,fParentid,fTrkid,fStepkE->at(0),*fStepx,*fStepy,*fStepz,*fStepde };
+        
+        if (fParentid == 0)
+        {
+            eventsMap[fTrkid].push_back(track_ii);
+        }
+        else
+        {
+            for (auto& event : eventsMap)
+            {
+                for (auto& parentTrk : event.second)
+                {
+                    if (parentTrk.trkid == fParentid)
+                    {
+                        event.second.push_back(track_ii);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    //std::cout << "Number of events: " << events.size() << std::endl;
+    std::printf("[INFO] Number of events: %zu\n", eventsMap.size());
+
+    for (auto event : eventsMap)
+    {
+        std::printf("trkid=[%d], size = [%zu]  \n", event.first, event.second.size());
+    }
+    return eventsMap;
+}
