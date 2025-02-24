@@ -607,11 +607,11 @@ const std::map<int, std::list<tracks_eeg>> Bkgtrack::GetEventsMap()
     }
 
     //std::cout << "Number of events: " << events.size() << std::endl;
-    std::printf("[INFO] Number of events: %zu\n", eventsMap.size());
+    //std::printf("[INFO] Number of events: %zu\n", eventsMap.size());
 
-    for (auto event : eventsMap)
-    {
-        std::printf("trkid=[%d], size = [%zu]  \n", event.first, event.second.size());
-    }
+    //for (auto event : eventsMap)
+    //{
+    //    std::printf("trkid=[%d], size = [%zu]  \n", event.first, event.second.size());
+    //}
     return eventsMap;
 }
