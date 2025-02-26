@@ -541,3 +541,70 @@ void geoEveViewer::PlotTracks(const std::map<int, std::list<tracks_eeg>>& inputT
         }
     }
 }
+
+//**********************************************************************
+void geoEveViewer::AnaBkgEvents(const std::map<int, std::list<tracks_eeg>>& inputEventsMap)
+{
+    std::map<int, std::string> particle_name{ {11,"e-"}, {-11,"e+"}, {22,"gamma"},
+                                              {2212,"proton"}, {2112,"neutron"} };
+    std::map<int, int> particle_cnt_map { {11,0}, {-11,0}, {22,0},
+                                          {2212,0}, {2112,0} };
+    int ii = 0;
+    for (const auto& evt : inputEventsMap)
+    {
+        if (ii >= 1)
+            break;
+        auto event_id = evt.first;
+        auto trks = evt.second;
+        std::cout << "event id : " << event_id << std::endl;
+
+        auto trk_iter = trks.begin();
+        for (; trk_iter != trks.end(); ++trk_iter)
+        {
+            //int pdgcode = trk_iter->pdg;
+            int parent_id = trk_iter->parentid;
+            //if (parent_id == 0)
+            //{
+                size_t trk_size = trk_iter->vxp.size();
+                auto x_end = trk_iter->vxp.at(trk_size - 1) / 10.;
+                auto y_end = trk_iter->vyp.at(trk_size - 1) / 10.;
+                auto z_end = trk_iter->vzp.at(trk_size - 1) / 10.;
+
+                std::string bgparticle = "gamma";
+                auto key_iter = particle_name.find(trk_iter->pdg);
+                if (key_iter != particle_name.end())
+                    bgparticle = key_iter->second;
+                else
+                    bgparticle = "unknown";
+
+                particle_cnt_map[trk_iter->pdg]++;
+
+                std::cout << " particle:  " << bgparticle
+                    << " e0: " << trk_iter->e0
+                    << " p_end : (" << x_end
+                    << "," << y_end
+                    << "," << z_end << ")"
+                    << std::endl;
+
+                auto node_end = geo_manager->FindNode(x_end, y_end, z_end);
+                if (!node_end)
+                    std::cout << "Error!!! Can not find a node~" << std::endl;
+                else
+                {
+                    auto curr_volname = node_end->GetVolume()->GetName();
+                    auto curr_material = node_end->GetMedium()->GetMaterial()->GetName();
+                    std::cout << "     vol : " << curr_volname << ", material " << curr_material << std::endl;
+                }
+            //}
+        }
+
+        ii++;
+    }
+
+    for (auto particles : particle_cnt_map)
+    {
+        std::cout << "$ " << particle_name[particles.first] << "\t"
+            << particles.second<< " trks" << std::endl;
+    }
+
+}

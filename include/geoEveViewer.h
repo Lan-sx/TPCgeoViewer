@@ -186,6 +186,13 @@ public:
     */
     void PlotTracks(const std::map<int,std::list<tracks_eeg>>& inputTrkMap, int maxtracks, bool onlyee=false, bool onlyparent=false);
 
+    /**
+    * @brief
+    * Analysis BG events
+    * @param const std::map<int,std::list<tracks_eeg>>& inputTrkMap
+    */
+    void AnaBkgEvents(const std::map<int, std::list<tracks_eeg>>& inputEventsMap);
+
 protected:
     TEveTrack* Make_Helixtrack(TEveTrackPropagator* prop, TVector3 pstart, TVector3 pend ,int sign);
     void DrawTrack(TVirtualGeoTrack *track);
