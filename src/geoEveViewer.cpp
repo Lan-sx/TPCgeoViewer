@@ -304,14 +304,16 @@ std::vector<X0tables> geoEveViewer::Start_Track(TVector3 pstart, TVector3 dirsta
 //**********************************************************************
 TH1D* geoEveViewer::GetXoverX0vsTheta()
 {
-    auto hXoverX0vsTheta = new TH1D("hXoverX0vsTheta", ";#theta [Degree];X/X_{0}",90,-90.,0.);
-    for (int itrk = 0; itrk < 900; ++itrk)
-    {
-        double theta = gRandom->Uniform(-90,.0);
-        double radtheta = TMath::DegToRad() * theta;
-        TVector3 pstart(0., 0., 0.);
-        TVector3 directVec(-TMath::Sin(radtheta)*TMath::Cos(TMath::PiOver4()), TMath::Sin(radtheta)*TMath::Cos(TMath::PiOver4()), TMath::Cos(radtheta));
 
+    auto hXoverX0vsTheta = new TH1D("hXoverX0vsTheta", ";#theta [Degree];X/X_{0}",1800,0.,180.);
+    for (int itrk = 0; itrk < 18000; ++itrk)
+    {
+        if (itrk % 2000 == 0)
+            std::printf("[info] ==%d done!\n", itrk);
+        double theta = gRandom->Uniform(0.,180);
+        double radtheta = TMath::DegToRad() * theta;
+        TVector3 directVec(-TMath::Sin(radtheta)*TMath::Cos(TMath::PiOver4()), TMath::Sin(radtheta)*TMath::Cos(TMath::PiOver4()), TMath::Cos(radtheta));
+        TVector3 pstart(0., 0., 0.);
         double XoverX0(0.);
         this->Start_Track(pstart, directVec,  kFALSE, XoverX0);
         //hXoverX0vsTheta->SetBinContent(45-itrk, XoverX0);
