@@ -323,6 +323,36 @@ TH1D* geoEveViewer::GetXoverX0vsTheta()
 }
 
 //**********************************************************************
+TH1D* geoEveViewer::GetXoverX0vsPhi()
+{
+    auto hXoverX0vsPhi = new TH1D("hXoverX0vsPhi", ";#Phi [Degree];X/X_{0}", 60, -180., 180.);
+
+    for (int ibin = 1; ibin <= 60; ++ibin)
+    {
+        double phi_i = -180. + (ibin-1)*6;
+        double radphi_i = TMath::DegToRad() * phi_i;
+        double sumTheta = 0.;
+        for (int kk = 0; kk < 550*2; ++kk)
+        //for (int kk = 0; kk < 200; ++kk)
+        //for (int kk = 0; kk < 1670; ++kk)
+        {
+            double theta = 35. + kk/10.;
+            if (fabs(theta - 90.) < 0.1) continue;
+            double radtheta = TMath::DegToRad() * theta;
+            TVector3 directVec(TMath::Sin(radtheta) * TMath::Cos(radphi_i), TMath::Sin(radtheta) * TMath::Sin(radphi_i), TMath::Cos(radtheta));
+            TVector3 pstart(0., 0., 0.);
+            double XoverX0(0.);
+            this->Start_Track(pstart, directVec, kFALSE, XoverX0);
+            sumTheta += XoverX0;
+        }
+        //if(ibin%10==0)
+        std::printf("[debug] phi=%.2f, X/X0=%.4f\n", phi_i, sumTheta /(550*2-3));
+        hXoverX0vsPhi->SetBinContent(ibin, sumTheta / (550.*2-3));
+    }
+
+    return hXoverX0vsPhi;
+
+}
 
 //transparency is integer percent 0/opacque 100/invisiable
 //void geoEveViewer::SetTransparency(Char_t ptransparency)
@@ -459,40 +489,25 @@ TEveTrack* geoEveViewer::Make_Helixtrack(TEveTrackPropagator* prop, TVector3 pst
 }
 
 //**********************************************************************
-void geoEveViewer::GenMCHelixTrack(TVector3 pstart, TVector3 pend, double magB , bool isRungKutta)
+void geoEveViewer::PlotHelixTrack(const Helix* mctrack)
 {
-    auto list = new TEveTrackList();
-    TEveTrackPropagator* prop = list->GetPropagator();
-    prop->SetFitDaughters(kFALSE);
-    prop->SetMaxZ(300);
-    prop->SetMaxR(180);
-
-    if (isRungKutta)
-    {
-        prop->SetStepper(TEveTrackPropagator::kRungeKutta);
-        list->SetName("RK Propagator");
-    }
-    else
-        list->SetName("Helix Propagator");
-
-    //Set magnetic field
-    prop->SetMagFieldObj(new MCMagB(magB));
-    list->SetElementName(Form("%s, const B", list->GetElementName()));
-
-    auto MCtrack = this->Make_Helixtrack(prop, pstart, pend,-1);
-
-    list->SetLineColor(ftrackColor);
-    MCtrack->SetLineColor(ftrackColor);
-    
+    auto vtrkpoints = mctrack->GetMCHelixTrk();
     cmp->OpenCompound();
-    cmp->AddElement(list);
-    list->AddElement(MCtrack);
+    TEveLine* trkline = new TEveLine(vtrkpoints.size());
+    auto lcolor = mctrack->GetTrkColor();
+    trkline->SetMainColor(lcolor);
+    trkline->SetLineColor(lcolor);
+    trkline->SetMarkerColor(lcolor);
+    trkline->SetLineStyle(1);
+    trkline->SetLineWidth(1);
+    trkline->SetRnrPoints(true);
+    for (size_t point_i=0; point_i < vtrkpoints.size(); ++point_i)
+    {
+        trkline->SetPoint(point_i, vtrkpoints.at(point_i).x(), vtrkpoints.at(point_i).y(), vtrkpoints.at(point_i).z());
+    }
+    cmp->AddElement(trkline);
     cmp->CloseCompound();
-
-    MCtrack->MakeTrack();
     this->UpdateProjectedView();
-
-
 }
 
 //**********************************************************************

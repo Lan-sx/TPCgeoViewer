@@ -27,6 +27,7 @@
 
 #include "MultiView.h"
 #include "Bkgtrack.h"
+#include "Helix.h"
 
 struct X0tables
 {
@@ -115,6 +116,13 @@ public:
      */
     TH1D* GetXoverX0vsTheta();
 
+    /**
+     * @brief
+     * Get X/X0 v.s. theta Hist
+     */
+    TH1D* GetXoverX0vsPhi();
+
+
     /** 
      * @brief
      * Turn off DrawTrack() when Shoot large number of tracks
@@ -177,7 +185,7 @@ public:
     * Generate a helix track, ref $ROOTSYS/tutorials/eve/track.C
     * 
     */
-    void GenMCHelixTrack(TVector3 pstart, TVector3 pend, double magB=-2.,bool isRungKutta=true);
+    void PlotHelixTrack(const Helix* mctrack);
 
     /**
     * @brief
