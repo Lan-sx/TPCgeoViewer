@@ -47,7 +47,7 @@ MultiView::MultiView(TEveManager* evem, TString viewname)
 	{
 		TEveProjectionAxes* a = new TEveProjectionAxes(fRhoZMgr);
 		a->SetMainColor(kWhite);
-		a->SetTitle("Rho-Z");
+		a->SetTitle("R-Z");
 		a->SetTitleSize(0.05);
 		a->SetTitleFont(102);
 		a->SetLabelSize(0.025);
@@ -81,7 +81,7 @@ MultiView::MultiView(TEveManager* evem, TString viewname)
 	fRPhiView->AddScene(fRPhiEventScene);
 
 	pack->NewSlot()->MakeCurrent();
-	fRhoZView = gEve->SpawnNewViewer("RhoZ View", "");
+	fRhoZView = gEve->SpawnNewViewer("RZ View", "");
 	fRhoZView->GetGLViewer()->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
 	fRhoZView->AddScene(fRhoZGeomScene);
 	fRhoZView->AddScene(fRhoZEventScene);

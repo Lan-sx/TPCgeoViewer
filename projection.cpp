@@ -35,7 +35,7 @@ using namespace std;
 void extractGentle()
 {
     //geoEveViewer::ExtractGentleVolume("../../geodata/TDR_Ecal.root", "../../geodata/TDR_Ecal_Extract.root",1);
-    geoEveViewer::ExtractGentleVolume("../../geodata/CepcTPCModularEndplatev02.root", "../../geodata/CepcTPCModularEndplatev02_Extract.root", 6);
+    geoEveViewer::ExtractGentleVolume("../../geodata/CepcBeamPipe07.root", "../../geodata/CepcBeamPipe07_Extract.root", 6);
 }
 
 
@@ -44,10 +44,13 @@ int main(int argc, char** argv)
     TApplication app("app",&argc,argv);
     //TRint app("app",&argc,argv);
     //extractGentle();
+
     LansxFormat::myStyle();
     //geoEveViewer *g = new geoEveViewer("../../geodata/TPC_ModularEndcap_o1_v01_MM_CF_bugfix.root", "../../geodata/TPC_ModularEndcap_o1_v01_MM_CF_bugfix_Extract.root", 80., kTRUE);
-    geoEveViewer* g = new geoEveViewer("../../geodata/CepcTPCModularEndplatev02.root", "../../geodata/CepcTPCModularEndplatev02_Extract.root", 80., kTRUE);
-    g->MakeMultiViewer();
+    //geoEveViewer* g = new geoEveViewer("../../geodata/CepcTPCModularEndplatev02.root", "../../geodata/CepcTPCModularEndplatev02_Extract.root", 80., kTRUE);
+    //geoEveViewer* g = new geoEveViewer("../../geodata/CepcBeamPipe07.root", "../../geodata/CepcBeamPipe07_Extract.root", 80., kTRUE);
+    //g->MakeMultiViewer();
+#if 0   
     Helix trk(1.16, 44.3, 90., 3.);
     trk.GenerateAtrack();
     g->PlotHelixTrack(&trk);
@@ -56,28 +59,30 @@ int main(int argc, char** argv)
     trk1.GenerateAtrack();
     trk1.SetTrkColor(kGreen);
     g->PlotHelixTrack(&trk1);
-
+#endif
     //g->DrawGeoinOGL("ogl");
     //auto geoman = g->Get_GeoManager();
     //auto node1 = geoman->FindNode(0, 120, 145.);
     //std::cout <<" Volume: "<< node1->GetVolume()->GetName()<<" material: "
     //          << node1->GetMedium()->GetMaterial()->GetName() << std::endl;
 
-    //TString logdir = "D:\\Data\\simulation\\CEPCSWBkgSimu\\MDIopt241226-250102\\Higgs_250415To250427\\SSinside_250421\\";
-    //TString logrootfile = logdir + "AlltracksSSinSide_Higgs_250421_10BX.root";
-    //Bkgtrack bkgtracks(logrootfile.Data());
+#if 1
+    TString logdir = "D:\\ÎÄµµ\\Documents\\Paper\\JINST_shexin_highgranularity_occupancy\\data\\Higgs\\";
+    //TString logdir = "D:\\ÎÄµµ\\Documents\\Paper\\JINST_shexin_highgranularity_occupancy\\data\\LowZ\\";
+    TString logrootfile = logdir + "AlltracksAlCrotch_Higgs_256_10BX.root";
+    Bkgtrack bkgtracks(logrootfile.Data());
     //bkgtracks.PrintTrackInfo(2);
     //bkgtracks.PlotPositionXYZDistribution(11, 0, true);
-    //bkgtracks.PlotParticleType();
-    //bkgtracks.FilleegtrackMap();
-    //bkgtracks.PlotGammaPositionDistribution();
+    bkgtracks.PlotParticleType();
+    bkgtracks.FilleegtrackMap();
+    bkgtracks.PlotGammaPositionDistribution();
     //auto selectedtracks = bkgtracks.GeteegTrackMaps();
     //std::printf("[INFO]: Map size =%zu\n", selectedtracks.size());
     //g->PlotTracks(selectedtracks, 10);
     //bkgtracks.PlotGammaDirectionDistribution();
     //auto primaryeetracks = bkgtracks.GetPrimaryParticleMaps();
     //std::printf("[INFO]: Map size =%zu\n", primaryeetracks.size());
-    
+#endif   
     //auto eventmap = bkgtracks.GetEventsMap();
     //int ii = 0;
     //for (auto event : eventmap)
@@ -119,9 +124,9 @@ int main(int argc, char** argv)
     //g->PlotTracks(eventmap, 1);
 
     //print secondary e- (caused by gamma) energy deposit
-    //std::printf("[INFO]: Total Energy Deposit=%.4f [MeV/BX]\n", bkgtracks.GetEDepbyelectronInTPC(10));
+    std::printf("[INFO]: Total Energy Deposit=%.4f [MeV/BX]\n", bkgtracks.GetEDepbyelectronInTPC(10));
     //bkgtracks.PlotPositionXYZDistribution(22, 2, true);
-    //bkgtracks.PlotGammaKEDistribution();
+    bkgtracks.PlotGammaKEDistribution();
 
     //auto listCan = gROOT->GetListOfCanvases();
     //auto cc1 = dynamic_cast<TCanvas*>(listCan->FindObject("Cgammaposition"));
@@ -133,10 +138,12 @@ int main(int argc, char** argv)
 
 
     //g->GenMCHelixTrack(p0,p1,-3);
-    //TVector3 p0(0., 0., 0.), p1(0., 1., 0.);
-    //double xx = 0;
-    //auto vecX0tables1 = g->Start_Track(p0, p1, kFALSE,xx);
-    //GuiTable::ShowX0guiTable(vecX0tables1);
+#if 0
+    TVector3 p0(0., 0., 81), p1(0., 1., 0.);
+    double xx = 0;
+    auto vecX0tables1 = g->Start_Track(p0, p1, kTRUE,xx);
+    GuiTable::ShowX0guiTable(vecX0tables1);
+#endif
     //std::cout << "======> " << xx << std::endl;
     //g->TurnOffDrawTrack();
     //auto h1 = g->GetXoverX0vsPhi();
